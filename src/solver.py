@@ -132,7 +132,10 @@ def solve(p, y_ref, alg_opts):
         Gp = Gp * suppGp[None, :] # only keep the active points #### TODO: ADD ACTIVE POINTS SETTING ####
 
         compact_ind = jnp.argsort(~suppGp) # index used to shift all the active points to the front
-        compact_ind = compact_ind[:blocksize]
+        
+        if blocksize > 0: # if -1 that means no blocksize limit
+            compact_ind = compact_ind[:blocksize]
+
         inv_compact_ind = jnp.argsort(compact_ind) # index used to shift all the active points back to the original order
       
         Gp_compact = Gp[:, compact_ind] # compacted gradient matrix 
@@ -180,6 +183,7 @@ def solve(p, y_ref, alg_opts):
 
         try:
             DR = HH @ DP + DDphi @ DP + (jnp.eye(HH.shape[0]) - DP)
+            print(f"Condition number of DR: {jnp.linalg.cond(DR):.2e}")
             dz = - jnp.linalg.solve(DR, R)
             dz = dz.flatten()
 
@@ -375,16 +379,16 @@ def solve(p, y_ref, alg_opts):
             print(f"\n#### PAD_SIZE decreased to {pad_size}, RECOMPILING: {recompile} ####\n")
 
             # update xhat_int and xhat_bnd, resampling
-        
-        p.xhat_int, p.xhat_bnd = p.sample_obs(p.Nobs, method=alg_opts.get('sampling', 'uniform'))
-        # recompute j due to resampling
-        y_ref = p.f(p.xhat)
-        y_ref = y_ref.at[-p.Nx_bnd:].set(p.ex_sol(p.xhat_bnd))
+        if alg_opts.get('sampling', 'uniform') != 'grid':
+            p.xhat_int, p.xhat_bnd = p.sample_obs(p.Nobs, method=alg_opts.get('sampling', 'uniform'))
+            # recompute j due to resampling
+            y_ref = p.f(p.xhat)
+            y_ref = y_ref.at[-p.Nx_bnd:].set(p.ex_sol(p.xhat_bnd))
 
-        yk, linear_results_int, linear_results_bnd = compute_rhs(p, xk, sk, ck)
-        misfit = yk - y_ref
-        j = obj.F(misfit)/alpha + jnp.sum(phi.phi(norms_c)) 
-            
+            yk, linear_results_int, linear_results_bnd = compute_rhs(p, xk, sk, ck)
+            misfit = yk - y_ref
+            j = obj.F(misfit)/alpha + jnp.sum(phi.phi(norms_c)) 
+        
 
     
     if plot_final:
