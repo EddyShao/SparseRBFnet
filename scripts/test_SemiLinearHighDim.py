@@ -1,7 +1,9 @@
 import sys
 sys.path.append("./")
 from pde.SemiLinearHighDim import PDE
-from src.solver import solve
+# from src.solver import solve
+# from src.solver_outer import solve_outer as solve
+from src.solver_outer_first_order import solve_outer_first_order as solve
 from src.utils import Objective, compute_errors, compute_y, compute_rhs
 
 import numpy as np
@@ -23,6 +25,9 @@ parser.add_argument('--sigma_max', type=float, default=1.0, help='Maximum value 
 parser.add_argument('--sigma_min', type=float, default=1e-3, help='Minimum value of the kernel width.')
 parser.add_argument('--blocksize', type=int, default=1000, help='Block size for the anisotropic mode.')
 parser.add_argument('--Nobs', type=int, default=10, help='Base number of observations')
+parser.add_argument('--Nobs_int', type=int, default=None, help='Number of interior observations')
+parser.add_argument('--Nobs_bnd', type=int, default=None, help='Number of boundary observations')
+parser.add_argument('--lr', type=float, default=1e-2, help='Learning rate for first-order method.')
 parser.add_argument('--sampling', type=str, default='grid', help='Sampling method for the observations.')
 parser.add_argument('--scale', type=float, default=0, help='penalty for the boundary condition')
 parser.add_argument('--TOL', type=float, default=1e-5, help='Tolerance for stopping.')
@@ -53,13 +58,30 @@ p = PDE(alg_opts)
 p.name = 'SemiLinearHighDim'
 
 
+# def ex_sol(x):
+#     x = jnp.atleast_2d(x)
+#     result = jnp.prod(jnp.sin(jnp.pi * x), axis=1) 
+#     return result if len(result) > 1 else result[0]
+
+# def f(x):
+#     return p.d * jnp.pi**2 * ex_sol(x) + ex_sol(x) ** 3
+
 def ex_sol(x):
-    x = jnp.atleast_2d(x)
-    result = jnp.prod(jnp.sin(jnp.pi * x), axis=1) 
-    return result if len(result) > 1 else result[0]
+    """
+    Exact solution u(x) = sum_{i=1}^d sin(pi/2 * x_i)
+    x: (..., d) or (d,)
+    """
+    x = jnp.atleast_2d(x)                          # (N, d)
+    result = jnp.sum(jnp.sin(0.5 * jnp.pi * x), axis=1)
+    return result if result.shape[0] > 1 else result[0]
+
 
 def f(x):
-    return p.d * jnp.pi**2 * ex_sol(x) + ex_sol(x) ** 3
+    """
+    RHS f(x) = -Δu(x) = (pi^2 / 4) * sum_{i=1}^d sin(pi/2 * x_i)
+             = (pi^2 / 4) * u(x)
+    """
+    return (jnp.pi**2 / 4.0) * ex_sol(x) + ex_sol(x) ** 3
 
 
 p.f = f
