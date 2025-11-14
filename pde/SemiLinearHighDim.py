@@ -150,9 +150,11 @@ class PDE:
 
 
         # Observation set
-        self.Nobs = alg_opt.get('Nobs', 50)
+        # self.Nobs = alg_opt.get('Nobs', 50)
+        self.Nobs_int = alg_opt.get('Nobs_int', None)
+        self.Nobs_bnd = alg_opt.get('Nobs_bnd', None)
 
-        self.xhat_int, self.xhat_bnd = self.sample_obs(self.Nobs, method=alg_opt.get('sampling', 'grid'))
+        self.xhat_int, self.xhat_bnd = self.sample_obs(self.Nobs_int, self.Nobs_bnd, method=alg_opt.get('sampling', 'grid'))
         self.xhat = jnp.vstack([self.xhat_int, self.xhat_bnd])
         self.Nx_int = self.xhat_int.shape[0]
         self.Nx_bnd = self.xhat_bnd.shape[0]
@@ -170,14 +172,14 @@ class PDE:
     def ex_sol(self, x):
         pass
 
-    def sample_obs(self, Nobs, method='grid'):
+    def sample_obs(self, Nobs_int, Nobs_bnd, method='grid'):
         """
         Samples observations from D
         method: 'uniform' or 'grid'
         """
 
-        # obs_int, obs_bnd = sample_cube_obs(self.D, Nobs, method=method)
-        Nobs_int, Nobs_bnd = int((Nobs - 2)**self.d), 2 * self.d * (Nobs - 2)**(self.d - 1)
+        # # obs_int, obs_bnd = sample_cube_obs(self.D, Nobs, method=method)
+        # Nobs_int, Nobs_bnd = int((Nobs - 2)**self.d), 2 * self.d * (Nobs - 2)**(self.d - 1)
         obs_int, obs_bnd = sample_cube_obs(self.D, Nobs_int, Nobs_bnd, method=method, rng=self.key)
         return obs_int, obs_bnd
 
