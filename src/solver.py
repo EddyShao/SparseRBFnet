@@ -7,13 +7,14 @@ from datetime import datetime
 from functools import partial
 from .utils import computeProx, Phi, compute_rhs, compute_y, compute_errors
 import jax 
+# from memory_profiler import profile
 
 jax.config.update("jax_enable_x64", True)  # Enable 64-bit precision    
 
 Prox = lambda v: computeProx(v, mu=1)
 
 
-
+# @profile
 def solve(p, y_ref, alg_opts):
     """
     Solve the Total Variation problem
@@ -119,9 +120,9 @@ def solve(p, y_ref, alg_opts):
         Dc_E_kappa, Dx_E_kappa, Ds_E_kappa = Grad_E['grad_c'], Grad_E['grad_X'], Grad_E['grad_S']
         Dc_B_kappa, Dx_B_kappa, Ds_B_kappa = Grad_B['grad_c'], Grad_B['grad_X'], Grad_B['grad_S']
         
-        Gp_c = jnp.vstack([jnp.array(Dc_E_kappa), jnp.array(Dc_B_kappa)])
-        Gp_x = jnp.vstack([jnp.array(Dx_E_kappa), jnp.array(Dx_B_kappa)])
-        Gp_s = jnp.vstack([jnp.array(Ds_E_kappa), jnp.array(Ds_B_kappa)])
+        Gp_c = jnp.vstack([Dc_E_kappa, Dc_B_kappa])
+        Gp_x = jnp.vstack([Dx_E_kappa, Dx_B_kappa])
+        Gp_s = jnp.vstack([Ds_E_kappa, Ds_B_kappa])
         
         if Gp_s.ndim == 2:
             Gp_s = Gp_s[:, :, None]
@@ -132,7 +133,7 @@ def solve(p, y_ref, alg_opts):
         Gp = Gp * suppGp[None, :] # only keep the active points #### TODO: ADD ACTIVE POINTS SETTING ####
 
         compact_ind = jnp.argsort(~suppGp) # index used to shift all the active points to the front
-        
+
         if blocksize > 0: # if -1 that means no blocksize limit
             compact_ind = compact_ind[:blocksize]
 
@@ -166,9 +167,11 @@ def solve(p, y_ref, alg_opts):
             kpp
         ])
         Icor_diag_compact = Icor_diag[compact_ind]
-        Icor = jnp.diag(Icor_diag_compact)
+        # Icor = jnp.diag(Icor_diag_compact)
 
-        HH = (1 / alpha) * (II + Icor)
+        # HH = (1 / alpha) * (II + Icor)
+        II = II.at[jnp.diag_indices(II.shape[0])].add(Icor_diag_compact)
+        HH = (1 / alpha) * II
 
         DP_diag = jnp.concatenate([
             (jnp.abs(qk) >= 1),
@@ -176,20 +179,24 @@ def solve(p, y_ref, alg_opts):
         ])
         DP_diag_compact = DP_diag[compact_ind]
 
-        DP = jnp.diag(DP_diag_compact)
+        # DP = jnp.diag(DP_diag_compact)
         DDphi_diag = jnp.concatenate([DDphima(ck), jnp.zeros((dim * pad_size))]) * suppGp
         DDphi_diag_compact = DDphi_diag[compact_ind]
-        DDphi = jnp.diag(DDphi_diag_compact)
+        # DDphi = jnp.diag(DDphi_diag_compact)s
 
         try:
-            DR = HH @ DP + DDphi @ DP + (jnp.eye(HH.shape[0]) - DP)
-            print(f"Condition number of DR: {jnp.linalg.cond(DR):.2e}")
+            # DR = HH @ DP + DDphi @ DP + (jnp.eye(HH.shape[0]) - DP)
+            DR = HH*DP_diag_compact 
+            DR = DR.at[jnp.diag_indices(DR.shape[0])].add(DP_diag_compact*DDphi_diag_compact + (1 - DP_diag_compact))
+            # print(f"Condition number of DR: {jnp.linalg.cond(DR):.2e}")
             dz = - jnp.linalg.solve(DR, R)
             dz = dz.flatten()
 
         except:
             try:
-                DR = HH @ DP + (jnp.eye(pad_size*(1+dim)) - DP)
+                # DR = HH @ DP + (jnp.eye(pad_size*(1+dim)) - DP)
+                DR = HH*DP_diag_compact 
+                DR = DR.at[jnp.diag_indices(DR.shape[0])].add((1 - DP_diag_compact) + jnp.finfo(float).eps)
                 dz = - jnp.linalg.solve(DR, R)
                 dz = dz.flatten()
             except:
@@ -204,7 +211,7 @@ def solve(p, y_ref, alg_opts):
         # assert jnp.all(jnp.abs(dz[int(jnp.sum(suppGp)):]) < 1e-14), "dz contains non-zero values in the lower trunk, check the problem setup."
 
         jold, xold, sold, qold = j, xk.copy(), sk.copy(), qk.copy()
-        pred = (R.T @ (DP @ dz.reshape(-1, 1))) # estimate of the descen
+        pred = (R.T @ (DP_diag_compact * dz).reshape(-1, 1)) # estimate of the descen
         theta = min(theta_old * 2, 1 - 1e-14) 
         has_descent = False
 
