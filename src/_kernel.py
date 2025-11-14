@@ -120,6 +120,16 @@ class _Kernel:
     @partial(jax.jit, static_argnums=(0,))
     def Grad_E_kappa_X_c_Xhat(self, X, S, c, Xhat):
         return jax.vmap(self.Grad_E_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
+    
+
+    @partial(jax.jit, static_argnums=(0,))
+    def Grad_c_E_kappa_X_c(self, X, S, c, xhat):
+        grad_c = jax.grad(self.E_kappa_X_c, argnums=2)(X, S, c, xhat)
+        return grad_c
+    
+    @partial(jax.jit, static_argnums=(0,))
+    def Grad_c_E_kappa_X_c_Xhat(self, X, S, c, Xhat):
+        return jax.vmap(self.Grad_c_E_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
 
 
     
@@ -133,7 +143,16 @@ class _Kernel:
     @partial(jax.jit, static_argnums=(0,)) 
     def Grad_B_kappa_X_c_Xhat(self, X, S, c, Xhat):
         return jax.vmap(self.Grad_B_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
-        
+
+
+    @partial(jax.jit, static_argnums=(0,))
+    def Grad_c_B_kappa_X_c(self, X, S, c, xhat):
+        grad_c = jax.grad(self.B_kappa_X_c, argnums=2)(X, S, c, xhat)
+        return grad_c
+
+    @partial(jax.jit, static_argnums=(0,))
+    def Grad_c_B_kappa_X_c_Xhat(self, X, S, c, Xhat):
+        return jax.vmap(self.Grad_c_B_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
 
     @partial(jax.jit, static_argnums=(0,))
     def DE_kappa(self, x, s, xhat, *args):
