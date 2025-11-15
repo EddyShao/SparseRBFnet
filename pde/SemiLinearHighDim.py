@@ -162,7 +162,7 @@ class PDE:
         # Optimization-related attributes
         self.obj = Objective(self.Nx_int, self.Nx_bnd, scale=self.scale)
 
-        self.Ntest = self.Nobs
+        # self.Ntest = self.Nobs
         self.test_int, self.test_bnd = self.xhat_int, self.xhat_bnd
 
     

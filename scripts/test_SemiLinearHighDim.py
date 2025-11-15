@@ -2,7 +2,7 @@ import sys
 sys.path.append("./")
 from pde.SemiLinearHighDim import PDE
 # from src.solver import solve
-# from src.solver_outer import solve_outer as solve
+from src.solver_outer import solve_outer as solve
 from src.solver_outer_first_order import solve_outer_first_order as solve
 from src.utils import Objective, compute_errors, compute_y, compute_rhs
 
@@ -115,9 +115,13 @@ def evaluate_and_save_solution(p, rhs, alg_opts, args):
     print('alpha:', alg_opts['alpha'])
     print('#' * 20)
     print()
+
     alg_out = solve(p, rhs, alg_opts)
 
-    p.test_int, p.test_bnd = p.sample_obs(20, method = 'grid') # sample 20 points in the interior and boundary for testing
+
+    Ntest_int = (20-2)**p.d
+    Ntest_bnd = 20**p.d - Ntest_int
+    p.test_int, p.test_bnd = p.sample_obs(Nobs_int=Ntest_int, Nobs_bnd=Ntest_bnd, method='grid') # sample 20 points in the interior and boundary for testing
     rhs_test = np.concatenate((p.f(p.test_int), p.ex_sol(p.test_bnd)))
     p.obj_test = Objective(p.test_int.shape[0], p.test_bnd.shape[0], scale=alg_opts['scale'])
 
