@@ -353,7 +353,7 @@ def solve(p, y_ref, alg_opts):
         # Stopping criterion
         if jnp.abs(pred * theta) < (TOL / alpha) and  max_sh_eta < (TOL / alpha):
             dz_norm = jnp.linalg.norm(dz, jnp.inf) if dz.size > 0 else 0.0  
-            print(f"CGNAP iter: {k}, j={j:.6f}, supp=({jnp.sum(suppc)}), "
+            print(f"Time: {time.time() - start_time:.2f}s CGNAP iter: {k}, j={j:.6f}, supp=({jnp.sum(suppc)}), "
                 f"desc={descent:.1e}, dz={dz_norm:.1e}, "
                 f"viol={max_sh_eta:.1e}, theta={theta:.1e}")
             

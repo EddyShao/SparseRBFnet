@@ -267,16 +267,7 @@ def solve_outer_first_order(p, y_ref, alg_opts):
         if k % plot_every == 0:            
             p.plot_forward(xk, sk, ck, suppc)
 
-        # # Stopping criterion
-        # if jnp.abs(pred * theta) < (TOL / alpha) and  max_sh_eta < (TOL / alpha):
-        #     dz_norm = jnp.linalg.norm(dz, jnp.inf) if dz.size > 0 else 0.0  
-        #     print(f"CGNAP iter: {k}, j={j:.6f}, supp=({jnp.sum(suppc)}), "
-        #         f"desc={descent:.1e}, dz={dz_norm:.1e}, "
-        #         f"viol={max_sh_eta:.1e}, theta={theta:.1e}")
-            
-        #     print("L_2 error: {L_2:.3e}, L_inf error: {L_inf:.3e}, (int: {L_inf_int:.3e}, bnd: {L_inf_bnd:.3e})".format(**errors))   
-        #     print(f"Converged in {k} iterations")
-        #     break
+        # Stopping criteria not implemented, since this is for warming up purpose
 
 
         if jnp.sum(suppc) < pad_size // 3 and k >= 100:
