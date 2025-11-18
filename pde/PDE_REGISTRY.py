@@ -4,7 +4,6 @@ from src.config.base_config import Config
 
 from pde.SemiLinearPDE import PDE as SemiLinearPDE
 from pde.SemiLinearHighDim import PDE as SemiLinearHighDim
-from pde.Eikonal import PDE as EikonalPDE
 # from pde.OtherPDE import PDE as OtherPDE  # add if/when needed
 
 
