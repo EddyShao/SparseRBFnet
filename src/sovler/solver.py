@@ -318,7 +318,7 @@ def solve(p, y_ref, alg_opts):
                 idx = pad_size
                 pad_size_id += 1
                 if pad_size_id not in pad_size_dict:
-                    pad_size_dict[pad_size_id] = pad_size * 2
+                    pad_size_dict[pad_size_id] = min(pad_size * 2, alg_opts.get('init_pad_size', 128))
                     recompile = True
                 else:
                     recompile = False
