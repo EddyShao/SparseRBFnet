@@ -5,6 +5,7 @@ from jax import config
 from jax.scipy.special import gamma
 import math
 from ._kernel import _Kernel
+from typing import Dict, Type
 # from utils import shapeParser
 
 class GaussianKernel(_Kernel):
@@ -259,3 +260,12 @@ class WendlandKernel(_Kernel):
         base = self._wendland_psi(r)
         factor = self._factor(sigma)
         return factor * base
+    
+
+
+
+KERNEL_BASE_REGISTRY: Dict[str, Type] = {
+    "gaussian": GaussianKernel,
+    "wendland": WendlandKernel,
+    "matern": MaternKernel,
+}

@@ -5,6 +5,8 @@ import jax
 from itertools import product
 import jax.numpy as jnp
 import jax.random 
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 def computeProx(v, mu):
     """
@@ -518,6 +520,76 @@ def compute_errors(p, x, s, c, test_int=None, test_bnd=None, y_true_int=None, y_
         'L_inf_bnd': l_inf_error_bnd,
         'L_inf': max(l_inf_error_int, l_inf_error_bnd)
     }
+
+def plot_solution_2d(p, x, s, c, suppc=None):
+    if suppc is None:
+        suppc = np.ones_like(c, dtype=bool)
+    # assert p.dim == 3 
+
+    # # Extract the domain range
+    # pO = p.Omega[:-1, :]
+    plt.close('all')  # Close previous figure to prevent multiple windows
+
+    # Create a new figure
+    fig = plt.figure(figsize=(15, 5))
+    ax1 = fig.add_subplot(131, projection='3d')
+    ax2 = fig.add_subplot(132, projection='3d')
+    ax3 = fig.add_subplot(133)
+
+    t_x = np.linspace(p.D[0, 0], p.D[0, 1], 100)
+    t_y = np.linspace(p.D[1, 0], p.D[1, 1], 100)
+    X, Y = np.meshgrid(t_x, t_y)
+    t = np.vstack((X.flatten(), Y.flatten())).T
+
+    if p.ex_sol is not None:
+        f1 = p.ex_sol(t).reshape(X.shape)
+    # Plot exact solution
+    surf1 = ax1.plot_surface(X, Y, f1, cmap='viridis', edgecolor='none')
+    ax1.set_title("Exact Solution")
+    ax1.set_xlabel("X-axis")
+    ax1.set_ylabel("Y-axis")
+    fig.colorbar(surf1, ax=ax1, shrink=0.5, aspect=5)
+
+    # Compute predicted solution
+    Gu = p.kernel.kappa_X_c_Xhat(x, s, c, t)
+    # sigma is sigmoid of S
+    sigma = p.kernel.sigma(s)
+
+    # Plot predicted solution
+    surf2 = ax2.plot_surface(X, Y, Gu.reshape(X.shape), cmap='viridis', edgecolor='none')
+    ax2.set_title("Predicted Solution") 
+    ax2.set_xlabel("X-axis")
+    ax2.set_ylabel("Y-axis")
+    ax2.set_zlabel("$f_2(x, y)$")
+    fig.colorbar(surf2, ax=ax2, shrink=0.5, aspect=5)
+
+
+    # plot all collocation point X
+    # together with error countour plot
+    contour = ax3.contourf(X, Y, np.abs(Gu.reshape(100, 100) - f1), cmap='viridis')        
+    # ax3.scatter(x[:, 0].flatten(), x[:, 1].flatten(), color='r', marker='x')
+    if hasattr(p.kernel, 'anisotropic') and p.kernel.anisotropic:
+        for xi, yi, ai, bi in zip(x[:, 0].flatten(), x[:, 1].flatten(), sigma[:, 0].flatten(), sigma[:, 1].flatten()):
+            ellipse = patches.Ellipse((xi, yi), width=2*ai, height=2*bi,
+                            edgecolor='r', facecolor='none',
+                            linestyle='dashed', label="Reference ellipse")
+            ax3.add_patch(ellipse)
+    else:
+        for xi, yi, r, ind in zip(x[:, 0].flatten(), x[:, 1].flatten(), sigma.flatten(), suppc):
+            if ind:
+                circle = plt.Circle((xi, yi), r, color='r', fill=False, linestyle='dashed', label="Reference circle")
+                ax3.scatter(xi, yi, color='r', marker='x')
+                ax3.add_patch(circle)
+
+    ax3.set_aspect('equal')  # Ensures circles are properly shaped
+    # # set colorbars
+    ax3.set_xlim(p.Omega[0, 0], p.Omega[0, 1])
+    ax3.set_ylim(p.Omega[1, 0], p.Omega[1, 1])
+    ax3.set_title("Collocation Points, Error Contour") 
+    fig.colorbar(contour, ax=ax3, shrink=0.5, aspect=5)   
+
+    plt.show(block=False)
+    plt.pause(1.0)  
 
 
 

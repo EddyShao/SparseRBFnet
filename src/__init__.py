@@ -1,11 +1,18 @@
-# mypackage/__init__.py# mypackage/__init__.py
-import os
-import glob
+# src/__init__.py
+"""
+Public API for the src package.
 
-# Get all module files except __init__.py
-modules = glob.glob(os.path.join(os.path.dirname(__file__), "*.py"))
-__all__ = [os.path.basename(f)[:-3] for f in modules if os.path.isfile(f) and not f.endswith("__init__.py")]
+We only expose subpackages (kernel, sovler, utils).
+Users are expected to import concrete classes/functions from these
+submodules, e.g.:
 
-# Import all modules dynamically
-for module in __all__:
-    exec(f"from .{module} import *")
+    from src.kernel.Kernels import GaussianKernel
+    from src.sovler.solver import solve
+"""
+
+from . import kernel
+from . import sovler   # note: folder name is 'sovler'
+from . import utils
+from . import config
+
+__all__ = ["kernel", "sovler", "utils", "config"]
