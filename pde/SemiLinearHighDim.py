@@ -55,20 +55,6 @@ class SemiLinearHighDimGaussianKernel(GaussianKernel):
         self.DE = (0,)
         self.DB = ()
 
-    # ------------ core kappa with optional mask ------------
-
-    @partial(jax.jit, static_argnums=(0,))
-    def kappa(self, x, s, xhat):
-        """
-        Scalar kernel κ(x, s; x̂).
-        """
-        out = super().kappa(x, s, xhat)
-        if self.mask and self.D is not None:
-            mask = jnp.prod(xhat - self.D[:, 0]) * jnp.prod(self.D[:, 1] - xhat)
-            out = out * mask
-        return out
-
-    # ------------ hard-coded Laplacian (Gaussian) ------------
 
     @partial(jax.jit, static_argnums=(0,))
     def Lap_kappa_X_c(self, X, S, c, xhat):
