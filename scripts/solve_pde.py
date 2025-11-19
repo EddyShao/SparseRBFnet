@@ -20,7 +20,7 @@ from src.config.output_config import (
     LevelResult,
     ExperimentResult,
 )
-from src.sovler.SOLVER_REGISTRY import SOLVER_REGISTRY
+from src.solver.SOLVER_REGISTRY import SOLVER_REGISTRY
 from src.utils import Objective, compute_errors, compute_rhs
 from pde.PDE_REGISTRY import build_pde_from_cfg  
 
