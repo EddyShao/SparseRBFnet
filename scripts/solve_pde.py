@@ -213,6 +213,8 @@ def evaluate_solution(
     alg_out: SolverOutput,
     level_index: int,
     alpha: float,
+    *,
+    Ntest=20
 ):
     """
     Compute train/test errors and residuals for the final solution.
@@ -221,6 +223,24 @@ def evaluate_solution(
     Uses the 'final' field of SolverOutput for evaluation.
     """
     # Build test RHS
+
+
+    """
+    Compute train/test errors and residuals for the final solution.
+
+    If regenerate_test=True, we resample test points (and RHS) on the fly
+    instead of using p.test_int / p.test_bnd created in __init__.
+    """
+    # -----------------------------
+    # 1) Possibly regenerate test set
+    # -----------------------------
+    Ntest_int, Ntest_bnd = (Ntest-2)**p.d, 2 * p.d * (Ntest - 2) ** (p.d - 1)
+    p.test_int, p.test_bnd = p.sample_obs(
+        Ntest_int,
+        Ntest_bnd,
+        method='grid',
+    )
+
     rhs_test_int = p.f(p.test_int)
     rhs_test_bnd = p.ex_sol(p.test_bnd)
     rhs_test = jnp.concatenate((rhs_test_int, rhs_test_bnd))
@@ -403,7 +423,8 @@ def main():
         alpha = level_res.alpha
         final_phase = level_res.phases[-1]
         final_alg_out = final_phase.output
-        summary_level = evaluate_solution(p, rhs, solver_global, final_alg_out, level_index=level_index+1, alpha=alpha)
+        summary_level = evaluate_solution(p, rhs, solver_global, final_alg_out, level_index=level_index+1, alpha=alpha, 
+                                        Ntest=getattr(cfg.pde, 'Ntest', 100))
         summary[level_index+1] = summary_level
     
     final_alg_out = all_outputs.levels[-1].phases[-1].output
