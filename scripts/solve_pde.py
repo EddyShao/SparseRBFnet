@@ -116,7 +116,7 @@ def run_phase(
     c_last = alg_out.final["u"]
 
     # In case a solver returned no active support
-    if x_last is None or s_last is None or c_last is None:
+    if x_last is None or s_last is None or c_last is None or len(c_last)==0:
         # fall back to zeros
         pad_size = getattr(p, "init_pad_size", 16)
         p.u_zero = {
