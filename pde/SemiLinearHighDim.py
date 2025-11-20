@@ -10,7 +10,7 @@ from typing import Dict, Callable, Any
 from src.kernel.Kernels import GaussianKernel, MaternKernel  # you can add Wendland/Matern later if desired
 from src.utils import Objective, sample_cube_obs
 
-jax.config.update("jax_enable_x64", True)
+# jax.config.update("jax_enable_x64", True)
 
 
 ###############################################################

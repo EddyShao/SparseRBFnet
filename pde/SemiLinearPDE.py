@@ -9,7 +9,7 @@ from typing import Dict, Callable, Any
 import jax
 import jax.numpy as jnp
 from functools import partial
-jax.config.update("jax_enable_x64", True)
+# jax.config.update("jax_enable_x64", True)
 
 ###############################################################
 ############ SemiLinear Kernel Mixin and Kernels ##############

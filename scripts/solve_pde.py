@@ -4,6 +4,7 @@ import argparse
 import os
 import pickle
 
+import jax
 import jax.numpy as jnp
 import numpy as np
 from typing import Optional
@@ -382,7 +383,11 @@ def main():
     if args.seed is not None:
         # assuming Config stores underlying dict in .data or similar
         cfg.pde.data["seed"] = args.seed
-        
+
+    jax.config.update("jax_enable_x64", getattr(cfg.solver, "fp64", True))
+    print("jax_enable_x64 =", jax.config.read("jax_enable_x64"))
+    print(f'DATA TYPE SANITY CHECK: {jnp.ones((16,)).dtype}')
+
     print("Loaded config:")
     print(cfg)
 

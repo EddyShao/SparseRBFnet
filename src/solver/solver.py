@@ -9,7 +9,7 @@ from ..utils import computeProx, Phi, compute_rhs, compute_y, compute_errors
 import jax 
 # from memory_profiler import profile
 
-jax.config.update("jax_enable_x64", True)  # Enable 64-bit precision    
+# jax.config.update("jax_enable_x64", True)  # Enable 64-bit precision    
 
 Prox = lambda v: computeProx(v, mu=1)
 
