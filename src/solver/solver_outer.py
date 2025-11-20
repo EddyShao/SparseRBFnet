@@ -197,7 +197,6 @@ def solve_outer(p, y_ref, alg_opts):
             # Map back: dz = D^{-1/2} dz_scaled
             dz = inv_sqrt_d.reshape(-1, 1) * dz
             dz = dz.flatten()
-            print(jnp.linalg.cond(DR))
 
         except:
             try:
