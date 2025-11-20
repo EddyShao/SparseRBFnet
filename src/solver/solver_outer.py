@@ -174,10 +174,30 @@ def solve_outer(p, y_ref, alg_opts):
 
         try:
             # DR = HH @ DP + DDphi @ DP + (jnp.eye(HH.shape[0]) - DP)
-            DR = HH*DP_diag_compact 
-            DR = DR.at[jnp.diag_indices(DR.shape[0])].add(DP_diag_compact*DDphi_diag_compact + (1 - DP_diag_compact))
-            dz = - jnp.linalg.solve(DR, R)
+            DR = HH * DP_diag_compact
+            DR = DR.at[jnp.diag_indices(DR.shape[0])].add(
+                DP_diag_compact * DDphi_diag_compact + (1.0 - DP_diag_compact)
+            )
+
+            # Diagonal preconditioner
+            diag_DR = jnp.diag(DR)
+            eps = 1e-12
+            sqrt_d = jnp.sqrt(jnp.abs(diag_DR) + eps)
+            inv_sqrt_d = 1.0 / sqrt_d
+
+            # Symmetric scaling in-place (conceptually): DR <- D^{-1/2} DR D^{-1/2}
+            DR = (inv_sqrt_d[:, None] * DR) * inv_sqrt_d[None, :]
+
+            # Scale RHS: R <- D^{-1/2} R
+            R_scaled = inv_sqrt_d.reshape(-1, 1) * R
+
+            # Solve preconditioned system
+            dz = -jnp.linalg.solve(DR, R_scaled)
+
+            # Map back: dz = D^{-1/2} dz_scaled
+            dz = inv_sqrt_d.reshape(-1, 1) * dz
             dz = dz.flatten()
+            print(jnp.linalg.cond(DR))
 
         except:
             try:

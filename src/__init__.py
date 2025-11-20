@@ -11,8 +11,8 @@ submodules, e.g.:
 """
 
 from . import kernel
-from . import sovler   # note: folder name is 'sovler'
+from . import solver   # note: folder name is 'sovler'
 from . import utils
 from . import config
 
-__all__ = ["kernel", "sovler", "utils", "config"]
+__all__ = ["kernel", "solver", "utils", "config"]
