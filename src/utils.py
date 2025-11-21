@@ -509,9 +509,9 @@ def compute_errors(p, x, s, c, test_int=None, test_bnd=None, y_true_int=None, y_
     if y_true_int is None or y_true_bnd is None:
         y_true_int = p.ex_sol(test_int)
         y_true_bnd = p.ex_sol(test_bnd)
-    len_test = test_bnd.shape[0] + test_int.shape[0]
+    len_test_int = test_int.shape[0]
     y_pred_int, y_pred_bnd = compute_y(p, x, s, c, test_int, test_bnd)
-    l2_error = jnp.sqrt((jnp.sum((y_pred_int - y_true_int)**2) + jnp.sum((y_pred_bnd - y_true_bnd)**2)) * p.vol_D / len_test)
+    l2_error = jnp.sqrt((jnp.sum((y_pred_int - y_true_int)**2)) * p.vol_D / len_test_int)
     l_inf_error_int = jnp.max(jnp.abs(y_pred_int - y_true_int))
     l_inf_error_bnd = jnp.max(jnp.abs(y_pred_bnd - y_true_bnd))
     return {
