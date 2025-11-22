@@ -91,7 +91,7 @@ def solve(p, y_ref, alg_opts):
 
     qk = jnp.sign(ck) + ck # change to robinson variale  
     # check consistency of Robinson variable
-    assert ck.size == 0 or jnp.linalg.norm(ck - Prox(qk), ord=jnp.inf) < 1e-14 
+    assert ck.size == 0 or jnp.linalg.norm(ck - Prox(qk), ord=jnp.inf) < 100 * jnp.finfo(float).eps, "Inconsistency in Robinson variable initialization."
 
     ck = Prox(qk) # Update ck, no change in default
     suppc = (jnp.abs(ck) > 0).flatten() # support of the outer weights
