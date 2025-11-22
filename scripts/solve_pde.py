@@ -291,14 +291,20 @@ def evaluate_solution(
         "L_inf error test (boundary): {L_inf_bnd_test:.2e}\n"
         "L_inf error test (interior): {L_inf_int_test:.2e}\n"
         "L_inf error test (total): {L_inf_test:.2e}\n"
-        "L_2 error test: {L_2_test:.2e}".format(**errors_test)
+        "L_2 error test: {L_2_test:.2e}\n"
+        "rel L_2 error test: {rel_L_2_test:.2e}"
+        .format(**errors_test)
     )
+
     print(f"residue test: {residue_test:.2e}")
+
     print(
         "L_inf error train (boundary): {L_inf_bnd_train:.2e}\n"
         "L_inf error train (interior): {L_inf_int_train:.2e}\n"
         "L_inf error train (total): {L_inf_train:.2e}\n"
-        "L_2 error train: {L_2_train:.2e}".format(**errors_train)
+        "L_2 error train: {L_2_train:.2e}\n"
+        "rel L_2 error train: {rel_L_2_train:.2e}"
+        .format(**errors_train)
     )
     print(f"residue train: {residue_train:.2e}")
     print(f"final support: {alg_out.meta['final_supp']}")
