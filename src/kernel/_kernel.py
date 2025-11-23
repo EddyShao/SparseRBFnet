@@ -80,6 +80,11 @@ class _Kernel:
         # return self.kappa_X_c(X, S, c, xhat)
         pass
     
+    @partial(jax.jit, static_argnums=(0,))
+    def B_aux_kappa_X_c(self, X, S, c, xhat):   
+        # return self.kappa_X_c(X, S, c, xhat)
+        pass
+    
     ############################################################
     ############################################################
 
@@ -105,6 +110,10 @@ class _Kernel:
         pass
  
     def B_kappa_X_c_Xhat(self, *linear_results):
+        # return linear_results[0]
+        pass
+    
+    def B_aux_kappa_X_c_Xhat(self, *linear_results):
         # return linear_results[0]
         pass
 
@@ -155,6 +164,26 @@ class _Kernel:
         return jax.vmap(self.Grad_c_B_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
 
     @partial(jax.jit, static_argnums=(0,))
+    def Grad_B_aux_kappa_X_c(self, X, S, c, xhat):
+        grads = jax.grad(self.B_aux_kappa_X_c, argnums=(0, 1, 2))(X, S, c, xhat)
+        return {'grad_X': grads[0], 'grad_S': grads[1], 'grad_c': grads[2]}
+
+
+    @partial(jax.jit, static_argnums=(0,)) 
+    def Grad_B_aux_kappa_X_c_Xhat(self, X, S, c, Xhat):
+        return jax.vmap(self.Grad_B_aux_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
+
+
+    @partial(jax.jit, static_argnums=(0,))
+    def Grad_c_B_aux_kappa_X_c(self, X, S, c, xhat):
+        grad_c = jax.grad(self.B_aux_kappa_X_c, argnums=2)(X, S, c, xhat)
+        return grad_c
+
+    @partial(jax.jit, static_argnums=(0,))
+    def Grad_c_B_aux_kappa_X_c_Xhat(self, X, S, c, Xhat):
+        return jax.vmap(self.Grad_c_B_aux_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
+
+    @partial(jax.jit, static_argnums=(0,))
     def DE_kappa(self, x, s, xhat, *args):
         # return -jnp.trace(jax.hessian(self.kappa, argnums=2)(x, s, xhat)) + 3 * args[0] ** 2 * self.kappa(x, s, xhat)
         pass
@@ -190,6 +219,26 @@ class _Kernel:
             args.append(linear_results[key])
         args = tuple(args)
         return jax.vmap(self.DB_kappa_X, in_axes=(None, None, 0)+(0,)*len(args))(X, S, Xhat, *args)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def DB_aux_kappa(self, x, s, xhat, *args):
+        # return self.kappa(x, s, xhat)
+        pass
+    
+    @partial(jax.jit, static_argnums=(0,))
+    def DB_aux_kappa_X(self, X, S, xhat, *args):
+        return jax.vmap(self.DB_aux_kappa, in_axes=(0, 0, None) + (None,)*len(args))(X, S, xhat, *args)
+    
+    @partial(jax.jit, static_argnums=(0,))
+    def DB_aux_kappa_X_Xhat(self, X, S, Xhat, *linear_results):
+        """
+        Compute the auxiliary boundary operator derivative wrt kernel params.
+        """
+        args = []
+        for key in self.DB:
+            args.append(linear_results[key])
+        args = tuple(args)
+        return jax.vmap(self.DB_aux_kappa_X, in_axes=(None, None, 0,) + (0,)*len(args))(X, S, Xhat, *args)
     
 
     
