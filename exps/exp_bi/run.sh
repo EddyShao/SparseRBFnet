@@ -1,0 +1,1 @@
+python scripts/solve_pde_aux.py --config exp_bi/bilap.yaml --seed 200 --save_dir exp_bi/bilap_results

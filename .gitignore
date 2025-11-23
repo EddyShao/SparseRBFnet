@@ -10,6 +10,9 @@ output_scripts/
 __pycache__
 .history/
 __pycache__/
-*.sh
+# *.sh
 figs/
 .DS_Store
+.vscode/
+*.pkl
+*_*results/
