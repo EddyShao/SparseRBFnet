@@ -419,7 +419,7 @@ def solve(p, y_ref, alg_opts):
             y_ref = p.f(p.xhat)
             y_ref = y_ref.at[-p.Nx_bnd:].set(p.ex_sol(p.xhat_bnd))
 
-            yk, linear_results_int, linear_results_bnd = compute_rhs(p, xk, sk, ck)
+            yk, linear_results_int, linear_results_bnd = compute_rhs_aux(p, xk, sk, ck)
             misfit = yk - y_ref
             j = obj.F(misfit)/alpha + jnp.sum(phi.phi(norms_c)) 
         
