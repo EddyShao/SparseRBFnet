@@ -41,7 +41,7 @@ class Objective:
         self.scale = scale
         self.Nx_int, self.Nx_bnd = Nx_int, Nx_bnd
         self.Nx = self.Nx_int + self.Nx_bnd
-        self.p_vec = jnp.ones(self.Nx) / self.Nx_int # Weight vector
+        self.p_vec = jnp.ones(self.Nx) / self.Nx_int if self.Nx_int > 0 else jnp.ones(self.Nx)  # Weight vector
         # self.p_vec[-self.Nx_bnd:] = scale / self.Nx_bnd # Apply penalty for boundary conditions
         self.p_vec = self.p_vec.at[-self.Nx_bnd:].set(scale / self.Nx_bnd)
         self.p_vec = self.p_vec.reshape(-1, 1) # reshape to column vector (Nx, 1)
