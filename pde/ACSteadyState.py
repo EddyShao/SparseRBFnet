@@ -36,6 +36,7 @@ class SemiLinearHighDimGaussianKernel(GaussianKernel):
         anisotropic: bool = False,
         mask: bool = False,
         D: jnp.ndarray = None,
+        eps_diff: float = 0.1
     ):
         super().__init__(
             d=d,
@@ -54,6 +55,8 @@ class SemiLinearHighDimGaussianKernel(GaussianKernel):
         # flags for derivative structures used in your solver
         self.DE = (0,)
         self.DB = ()
+        
+        self.eps_diff = eps_diff
 
 
     @partial(jax.jit, static_argnums=(0,))
@@ -94,7 +97,7 @@ class SemiLinearHighDimGaussianKernel(GaussianKernel):
         """
         u_val = self.kappa_X_c(X, S, c, xhat)
         lap_u = self.Lap_kappa_X_c(X, S, c, xhat)
-        return -lap_u + u_val**3
+        return - (self.eps_diff**2) * lap_u + u_val**3 - u_val
 
     @partial(jax.jit, static_argnums=(0,))
     def B_kappa_X_c(self, X, S, c, xhat):
@@ -108,7 +111,7 @@ class SemiLinearHighDimGaussianKernel(GaussianKernel):
     def E_kappa_X_c_Xhat(self, *linear_results):
         # linear_results = (kappa_X_c_Xhat, Lap_kappa_X_c_Xhat)
         u_vals, lap_u_vals = linear_results
-        return -lap_u_vals + u_vals**3
+        return - (self.eps_diff**2) * lap_u_vals + u_vals**3 - u_vals
 
     def B_kappa_X_c_Xhat(self, *linear_results):
         (u_vals,) = linear_results
@@ -128,7 +131,7 @@ class SemiLinearHighDimGaussianKernel(GaussianKernel):
         temp = (squared_diff - self.d * sigma**2) / (sigma**4)
         u_val = self.kappa(x, s, xhat)  # scalar
         # args[0] is typically κ_X_c or similar, following your old interface
-        return -u_val * temp + 3 * (args[0] ** 2) * u_val
+        return - self.eps_diff**2 * u_val * temp + 3 * (args[0] ** 2) * u_val  - u_val
 
     @partial(jax.jit, static_argnums=(0,))
     def DB_kappa(self, x, s, xhat, *args):
@@ -154,7 +157,7 @@ class SemiLinearHighDimMaternKernel(MaternKernel):
     """
 
     def __init__(self, d, power, sigma_max, sigma_min,
-                 anisotropic=False, mask=False, D=None, nu=1.5):
+                 anisotropic=False, mask=False, D=None, nu=1.5, eps_diff=0.1):
         """
         Parameters
         ----------
@@ -188,6 +191,7 @@ class SemiLinearHighDimMaternKernel(MaternKernel):
         self.linear_B = (self.kappa_X_c_Xhat,)
         self.DE = (0,)
         self.DB = ()
+        self.eps_diff = eps_diff
 
     # ---------------- core kappa with optional mask ----------------
 
@@ -239,8 +243,9 @@ class SemiLinearHighDimMaternKernel(MaternKernel):
 
     @partial(jax.jit, static_argnums=(0,))
     def E_kappa_X_c(self, X, S, c, xhat):
-        # E(u) = -Δu + u^3
-        return - self.Lap_kappa_X_c(X, S, c, xhat) + self.kappa_X_c(X, S, c, xhat) ** 3
+        lap = self.Lap_kappa_X_c(X, S, c, xhat)
+        kappa = self.kappa_X_c(X, S, c, xhat)
+        return - self.eps_diff**2 * lap + kappa ** 3 - kappa
 
     @partial(jax.jit, static_argnums=(0,))
     def B_kappa_X_c(self, X, S, c, xhat):
@@ -249,7 +254,7 @@ class SemiLinearHighDimMaternKernel(MaternKernel):
 
     def E_kappa_X_c_Xhat(self, *linear_results):
         # linear_results = (kappa_X_c_Xhat, Lap_kappa_X_c_Xhat)
-        return - linear_results[1] + linear_results[0] ** 3
+        return - self.eps_diff**2 * linear_results[1] + linear_results[0] ** 3 - linear_results[0]
 
     def B_kappa_X_c_Xhat(self, *linear_results):
         return linear_results[0]
@@ -276,265 +281,344 @@ class SemiLinearHighDimMaternKernel(MaternKernel):
         lap_phi = a**2 * phi * (a * r - self.d) / (1.0 + a * r)
 
         # E φ = -Δφ + (u(x))^3 φ, where u(x) ≈ args[0]
-        return -lap_phi + 3.0 * (args[0] ** 2) * phi
+        return - self.eps_diff**2 * lap_phi + 3.0 * (args[0] ** 2) * phi - phi
 
     @partial(jax.jit, static_argnums=(0,))
     def DB_kappa(self, x, s, xhat, *args):
         return self.kappa(x, s, xhat)
     
-
-
-
-
-def ex_sol_prod(x):
-    x = jnp.atleast_2d(x)
-    result = jnp.prod(jnp.sin(jnp.pi * x), axis=1) 
-    return result if len(result) > 1 else result[0]
-
-def f_prod(x):
-    d = x.shape[-1]
-    return d * jnp.pi**2 * ex_sol_prod(x) + ex_sol_prod(x) ** 3
-
-def ex_sol_sum (x):
+def _ex_sol_tanh4d_single(x, eps=0.1):
     """
-    Exact solution u(x) = sum_{i=1}^d sin(pi/2 * x_i)
-    x: (..., d) or (d,)
+    Single-point version of the 4D tanh-layer solution:
+
+        u(x) = tanh((x1 - 0.2)/eps) * tanh((x2 + 0.3)/eps)
+               * sin(pi x3) * sin(pi x4)
+
+    x: (d,) but we assume d >= 4 and only use the first four coordinates.
     """
-    x = jnp.atleast_2d(x)                          # (N, d)
-    result = jnp.sum(jnp.sin(0.5 * jnp.pi * x), axis=1)
-    return result if result.shape[0] > 1 else result[0]
-
-
-def f_sum(x):
-    """
-    RHS f(x) = -Δu(x) = (pi^2 / 4) * sum_{i=1}^d sin(pi/2 * x_i)
-             = (pi^2 / 4) * u(x)
-    """
-    return (jnp.pi**2 / 4.0) * ex_sol_sum(x) + ex_sol_sum(x) ** 3
-
-
-
-def ex_sol_high_freq(x, K=1.0):
-    """
-    Exact solution:
-        u(x) = sum_{i=1}^d [cos(6*pi*K*x_i) - sin(2*pi*K*x_i)]
-    x: (..., d) or (d,)
-    """
-    x = jnp.atleast_2d(x)  # (N, d)
-    u = jnp.sum(jnp.cos(6.0 * jnp.pi * K * x) - jnp.sin(2.0 * jnp.pi * K * x),
-                axis=1)
-    return u if u.shape[0] > 1 else u[0]
-
-
-def f_high_freq(x, K=1.0):
-    """
-    RHS for the semilinear PDE:
-        -Δu(x) + u(x)^3 = f(x)
-    with u as in ex_sol_sum_periodic.
-    """
-    x = jnp.atleast_2d(x)  # (N, d)
-
-    # u(x)
-    u = jnp.sum(jnp.cos(6.0 * jnp.pi * K * x) - jnp.sin(2.0 * jnp.pi * K * x),
-                axis=1)
-
-    # -Δu(x) = sum_i [ (6*pi*K)^2 cos(6*pi*K x_i) - (2*pi*K)^2 sin(2*pi*K x_i) ]
-    term_lap = jnp.sum(
-        (6.0 * jnp.pi * K) ** 2 * jnp.cos(6.0 * jnp.pi * K * x)
-        - (2.0 * jnp.pi * K) ** 2 * jnp.sin(2.0 * jnp.pi * K * x),
-        axis=1
+    x1, x2, x3, x4 = x[0], x[1], x[2], x[3]
+    return (
+        jnp.tanh((x1 - 0.2) / eps)
+        * jnp.tanh((x2 + 0.3) / eps)
+        * jnp.sin(jnp.pi * x3)
+        * jnp.sin(jnp.pi * x4)
     )
 
-    f = term_lap + u ** 3
-    return f if f.shape[0] > 1 else f[0]
 
-
-def ex_sol_multiscale(x):
+def ex_sol_tanh4d(x, eps=0.1):
     r"""
-    Exact solution:
-        u(x) = prod_{i=1}^d sin(pi x_i) + 0.1 * sum_{i=1}^d sin(7 pi x_i)
+    Exact 4D solution with internal layers:
+
+        u(x) = tanh((x1 - 0.2)/eps) * tanh((x2 + 0.3)/eps)
+               * sin(pi x3) * sin(pi x4),
+
+    intended for d = 4 on D = [-1,1]^4.
 
     x: (..., d) or (d,)
     returns: scalar if input is (d,), or (N,) if input is (N, d)
     """
     x = jnp.atleast_2d(x)  # (N, d)
-    # First term: product_i sin(pi x_i)
-    sin_pi = jnp.sin(jnp.pi * x)
-    term1 = jnp.prod(sin_pi, axis=1)  # (N,)
 
-    # Second term: 0.1 * sum_i sin(7 pi x_i)
-    sin_7pi = jnp.sin(7.0 * jnp.pi * x)
-    term2 = 0.1 * jnp.sum(sin_7pi, axis=1)  # (N,)
+    vals = jax.vmap(lambda y: _ex_sol_tanh4d_single(y, eps))(x)  # (N,)
+    return vals if vals.shape[0] > 1 else vals[0]
 
-    u = term1 + term2  # (N,)
+
+def _laplacian_tanh4d_single(x, eps=0.1):
+    """
+    Compute Δu(x) via trace of Hessian for the tanh4d solution.
+    x: (d,) with d >= 4
+    """
+    def u_fun(z):
+        return _ex_sol_tanh4d_single(z, eps)
+
+    H = jax.hessian(u_fun)(x)  # (d, d)
+    return jnp.trace(H)
+
+
+def f_tanh4d(x, eps=0.1):
+    r"""
+    RHS for the semilinear 4D PDE
+
+        -0.01 Δu(x) + u(x)^3 - u(x) = f(x),
+
+    with
+        u(x) = tanh((x1 - 0.2)/eps) * tanh((x2 + 0.3)/eps)
+               * sin(pi x3) * sin(pi x4).
+
+    x: (..., d) or (d,), intended for d = 4.
+    returns: scalar if input is (d,), or (N,) if input is (N, d)
+    """
+    x = jnp.atleast_2d(x)  # (N, d)
+
+    def f_single(y):
+        u = _ex_sol_tanh4d_single(y, eps)
+        lap_u = _laplacian_tanh4d_single(y, eps)  # Δu
+        return -eps**2 * lap_u + u**3 - u
+
+    vals = jax.vmap(f_single)(x)  # (N,)
+    return vals if vals.shape[0] > 1 else vals[0]
+
+
+
+def ex_sol_sine_easy(x):
+    """
+    u(x) = sum_i sin(pi * x_i)
+    works for any dimension d
+    """
+    x = jnp.atleast_2d(x)
+    return jnp.sum(jnp.sin(jnp.pi * x), axis=1) \
+           if x.shape[0] > 1 else jnp.sum(jnp.sin(jnp.pi * x))
+
+
+def f_sine_easy(x, eps=0.1):
+    """
+    f(x) = eps^2 * pi^2 * u(x) + u(x)^3 - u(x)
+    matching the PDE:
+        -eps^2 Δu + u^3 - u = f
+    and Δu = -pi^2 u
+    """
+    u = ex_sol_sine_easy(x)
+    return (eps**2) * (jnp.pi**2) * u + u**3 - u
+
+
+def ex_sol_tanh_radial(x, eps=0.1, r0=0.25):
+    r"""
+    Radial Allen–Cahn-type layer:
+
+        u(x) = tanh((||x|| - r0) / eps) + 1,
+
+    where ||x|| = sqrt(sum_i x_i^2).
+    Works for any spatial dimension d >= 1.
+    """
+    x = jnp.atleast_2d(x)            # (N, d)
+    r = jnp.sqrt(jnp.sum(x**2, axis=1))  # (N,)
+    xi = (r - r0) / eps
+    u = jnp.tanh(xi) + 1.0
     return u if u.shape[0] > 1 else u[0]
 
 
-def f_multiscale(x):
+def f_tanh_radial(x, eps=0.1, r0=0.25):
     r"""
-    RHS for the semilinear Poisson-type PDE:
-        -Δu(x) + u(x)^3 = f(x),
+    RHS for the semilinear PDE
+
+        -eps^2 Δu(x) + u(x)^3 - u(x) = f(x),
 
     with
-        u(x) = prod_{i=1}^d sin(pi x_i) + 0.1 * sum_{i=1}^d sin(7 pi x_i).
+        u(x) = tanh((||x|| - r0) / eps) + 1.
 
-    Analytic Laplacian:
-        Let A(x) = prod_i sin(pi x_i)
-            ⇒ ∂^2 A/∂x_k^2 = -pi^2 A, so ΔA = -d * pi^2 * A.
-        Let B(x) = 0.1 * sum_i sin(7 pi x_i)
-            ⇒ ΔB = - (7 pi)^2 * B.
-
-        Hence Δu = -d * pi^2 * A - (7 pi)^2 * B,
-        so -Δu = d * pi^2 * A + (7 pi)^2 * B,
-        and f(x) = -Δu + u^3.
+    Works for any d >= 1.
     """
-    x = jnp.atleast_2d(x)  # (N, d)
+    x = jnp.atleast_2d(x)             # (N, d)
     d = x.shape[1]
 
-    # A(x) = prod_i sin(pi x_i)
-    sin_pi = jnp.sin(jnp.pi * x)
-    A = jnp.prod(sin_pi, axis=1)  # (N,)
+    r = jnp.sqrt(jnp.sum(x**2, axis=1))   # (N,)
+    r_safe = jnp.maximum(r, 1e-8)
 
-    # B(x) = 0.1 * sum_i sin(7 pi x_i)
-    sin_7pi = jnp.sin(7.0 * jnp.pi * x)
-    B = 0.1 * jnp.sum(sin_7pi, axis=1)  # (N,)
+    xi = (r - r0) / eps
+    v = jnp.tanh(xi)               # unshifted tanh
+    u = v + 1.0                   # full solution
+    sech2 = 1.0 / jnp.cosh(xi)**2
 
-    u = A + B  # (N,)
+    # φ'(r) = (1/eps) * sech^2(xi)
+    phi_r = (1.0 / eps) * sech2
+    # φ''(r) = -2/eps^2 * tanh(xi) * sech^2(xi)
+    phi_rr = -2.0 / (eps**2) * v * sech2
 
-    # -Δu = d * pi^2 * A + (7 pi)^2 * B
-    term_lap = d * (jnp.pi ** 2) * A + (7.0 * jnp.pi) ** 2 * B  # (N,)
+    # Δu = φ''(r) + (d-1)/r * φ'(r)
+    lap_u = phi_rr + (d - 1.0) / r_safe * phi_r
 
-    f = term_lap + u ** 3  # (N,)
+    # f = -eps^2 Δu + u^3 - u, with u = tanh(xi) + 1
+    f = -(eps**2) * lap_u + u**3 - u
     return f if f.shape[0] > 1 else f[0]
 
 
-def _ex_sol_bump4d_single(x, R=0.3):
-    """
-    x: (4,)
-    returns: scalar u(x)
-    """
-    x0 = jnp.array([0.5, 0.5, 0.5, 0.5])
-    diff = x - x0
-    r2 = jnp.sum(diff**2)
-    t = 1.0 - r2 / (R**2)
-    t_pos = jnp.maximum(t, 0.0)
-    return t_pos**4  # compactly supported C^2 bump
-
-
-def ex_sol_bump4d(x, R=0.3):
+def ex_sol_tanh_radial_2bump(
+    x,
+    eps=0.1,
+    s1=10,
+    r01=0.25,
+    s2=1/10,
+    r02=0.50,
+    c1=None,
+    c2=None,
+):
     r"""
-    Exact solution in 4D:
-        u(x) = (1 - ||x - x0||^2 / R^2)^4_+,
-    where x0 = (0.5,0.5,0.5,0.5), R ~ 0.3.
+    Two-bump radial Allen–Cahn-type layer:
 
-    x: (..., 4) or (4,)
-    returns: scalar if input is (4,), or (N,) if input is (N, 4)
+        u(x) = u1(x) + u2(x),
+      where
+        u1(x) = tanh((||x - c1|| - r01) / eps1) + 1,
+        u2(x) = tanh((||x - c2|| - r02) / eps2) + 1.
+
+    Default:
+        - d is inferred from x (any d >= 1, typically d = 4),
+        - c1 = (0.5, 0.5, ..., 0.5),
+        - c2 = (-0.5, -0.5, ..., -0.5).
+
+    x: (..., d) or (d,)
+    returns: scalar if input is (d,), or (N,) if input is (N, d)
     """
-    x = jnp.atleast_2d(x)  # (N, 4)
-    vals = jax.vmap(lambda y: _ex_sol_bump4d_single(y, R))(x)  # (N,)
+    x = jnp.atleast_2d(x)  # (N, d)
+    N, d = x.shape
+
+    if c1 is None:
+        c1 = jnp.ones(d) * 0.5
+    if c2 is None:
+        c2 = -jnp.ones(d) * 0.5
+
+    # distances to each center
+    r1 = jnp.sqrt(jnp.sum((x - c1) ** 2, axis=1))  # (N,)
+    r2 = jnp.sqrt(jnp.sum((x - c2) ** 2, axis=1))  # (N,)
+
+    xi1 = (r1 - r01) / (eps * s1)
+    xi2 = (r2 - r02) / (eps * s2)
+
+    v1 = jnp.tanh(xi1)
+    v2 = jnp.tanh(xi2)
+
+    u1 = v1 + 1.0
+    u2 = v2 + 1.0
+
+    u = u1 + u2  # (N,)
+    return u if N > 1 else u[0]
+
+
+def f_tanh_radial_2bump(
+    x,
+    eps=0.1,
+    s1=10,
+    r01=0.25,
+    s2=1/10,
+    r02=0.50,
+    c1=None,
+    c2=None,
+):
+    r"""
+    RHS for the semilinear PDE
+
+        -eps_diff^2 Δu(x) + u(x)^3 - u(x) = f(x),
+
+    with two-bump exact solution
+
+        u(x) = u1(x) + u2(x),
+      where
+        u1(x) = tanh((||x - c1|| - r01) / eps1) + 1,
+        u2(x) = tanh((||x - c2|| - r02) / eps2) + 1.
+
+    Works for any d >= 1 (typically d = 4).
+    """
+    x = jnp.atleast_2d(x)  # (N, d)
+    N, d = x.shape
+
+    if c1 is None:
+        c1 = jnp.ones(d) * 0.5
+    if c2 is None:
+        c2 = -jnp.ones(d) * 0.5
+
+    # distances to each center
+    r1 = jnp.sqrt(jnp.sum((x - c1) ** 2, axis=1))  # (N,)
+    r2 = jnp.sqrt(jnp.sum((x - c2) ** 2, axis=1))  # (N,)
+
+    r1_safe = jnp.maximum(r1, 1e-8)
+    r2_safe = jnp.maximum(r2, 1e-8)
+
+    # local coordinates
+    xi1 = (r1 - r01) / (eps * s1)
+    xi2 = (r2 - r02) / (eps * s2)
+
+    v1 = jnp.tanh(xi1)        # unshifted
+    v2 = jnp.tanh(xi2)
+    u1 = v1 + 1.0             # shifted
+    u2 = v2 + 1.0
+
+    u = u1 + u2               # total solution, shape (N,)
+
+    sech2_1 = 1.0 / jnp.cosh(xi1) ** 2
+    sech2_2 = 1.0 / jnp.cosh(xi2) ** 2
+
+    # For each bump j:
+    #   φ_j'(r_j)  = (1/eps_j) * sech^2(xi_j)
+    #   φ_j''(r_j) = -2/eps_j^2 * tanh(xi_j) * sech^2(xi_j)
+
+    phi1_r = (1.0 / (eps * s1)) * sech2_1
+    phi2_r = (1.0 / (eps * s2)) * sech2_2
+
+    phi1_rr = -2.0 / (eps * s1) ** 2 * v1 * sech2_1
+    phi2_rr = -2.0 / (eps * s2) ** 2 * v2 * sech2_2
+
+    # Δu1, Δu2 (radial formula per center)
+    lap_u1 = phi1_rr + (d - 1.0) / r1_safe * phi1_r
+    lap_u2 = phi2_rr + (d - 1.0) / r2_safe * phi2_r
+
+    lap_u = lap_u1 + lap_u2  # total Laplacian
+
+    # f = -eps_diff^2 Δu + u^3 - u
+    f = -(eps ** 2) * lap_u + u ** 3 - u
+
+    return f if N > 1 else f[0]
+
+
+def _ex_sol_tanh_grid_single(x, eps=0.1, alpha=40.0):
+    """
+    Single-point version of a 'tanh grid' solution:
+
+        u(x) = tanh(alpha * prod_i sin(pi x_i))
+
+    eps is kept in the signature so that PDE._build_exact_sol_rhs
+    can pass eps=self.eps_diff, but we don't actually use eps here.
+    """
+    g = jnp.prod(jnp.sin(jnp.pi * x))  # scalar
+    return jnp.tanh(alpha * g)
+
+
+def ex_sol_tanh_grid(x, eps=0.1, alpha=40.0):
+    r"""
+    Multi-layer internal structure:
+
+        u(x) = tanh(alpha * prod_i sin(pi x_i)),
+
+    which creates a grid of thin internal layers where sin(pi x_i) = 0.
+
+    Works for any d >= 1. alpha controls the thickness of layers:
+    larger alpha -> thinner layers.
+    """
+    x = jnp.atleast_2d(x)  # (N, d)
+
+    vals = jax.vmap(lambda y: _ex_sol_tanh_grid_single(y, eps=eps, alpha=alpha))(x)
     return vals if vals.shape[0] > 1 else vals[0]
 
 
-# ---------- Laplacian via Hessian trace ----------
+def _laplacian_tanh_grid_single(x, eps=0.1, alpha=40.0):
+    """
+    Compute Δu(x) = trace(Hessian(u)) for the tanh-grid solution at a single point.
+    """
 
-def _laplacian_bump4d_single(x, R=0.3):
-    """
-    Compute Δu(x) via trace of Hessian for the bump solution.
-    x: (4,)
-    """
     def u_fun(z):
-        return _ex_sol_bump4d_single(z, R)
+        return _ex_sol_tanh_grid_single(z, eps=eps, alpha=alpha)
 
-    H = jax.hessian(u_fun)(x)  # (4, 4)
+    H = jax.hessian(u_fun)(x)  # (d, d)
     return jnp.trace(H)
 
 
-# ---------- RHS f(x) for -Δu + u^3 = f ----------
-
-def f_bump4d(x, R=0.3):
+def f_tanh_grid(x, eps=0.1, alpha=40.0):
     r"""
-    RHS for the semilinear 4D Poisson-type PDE:
-        -Δu(x) + u(x)^3 = f(x),
+    RHS for
 
-    with
-        u(x) = (1 - ||x - x0||^2 / R^2)^4_+, x0 = (0.5,...,0.5).
+        -eps^2 Δu(x) + u(x)^3 - u(x) = f(x),
 
-    x: (..., 4) or (4,)
-    returns: scalar if input is (4,), or (N,) if input is (N, 4)
+    with u(x) = tanh(alpha * prod_i sin(pi x_i)).
+
+    eps is the diffusion scale (this should match p.eps_diff).
     """
-    x = jnp.atleast_2d(x)  # (N, 4)
+    x = jnp.atleast_2d(x)  # (N, d)
 
     def f_single(y):
-        u = _ex_sol_bump4d_single(y, R)
-        lap_u = _laplacian_bump4d_single(y, R)
-        return -lap_u + u**3
+        u = _ex_sol_tanh_grid_single(y, eps=eps, alpha=alpha)
+        lap_u = _laplacian_tanh_grid_single(y, eps=eps, alpha=alpha)
+        return -eps**2 * lap_u + u**3 - u
 
-    vals = jax.vmap(f_single)(x)  # (N,)
+    vals = jax.vmap(f_single)(x)
     return vals if vals.shape[0] > 1 else vals[0]
-
-
-
-
-
-# ---------- exact solution u(x) ----------
-
-def _ex_sol_rpow4d_single(x, alpha=.6):
-    """
-    x: (4,)
-    returns: scalar u(x) = r(x)^alpha * prod_i sin(pi x_i)
-    """
-    x0 = jnp.array([0.5, 0.5, 0.5, 0.5])
-    r = jnp.linalg.norm(x - x0)
-    # If you're paranoid about r=0, you can do r = jnp.maximum(r, 1e-12)
-    s = jnp.prod(jnp.sin(jnp.pi * x))
-    return (r ** alpha) * s
-
-
-def ex_sol_rpow4d(x, alpha=.6):
-    r"""
-    Exact solution in 4D:
-        u(x) = ||x - x0||^alpha * Π_{i=1}^4 sin(pi x_i),
-    where x0 = (0.5,0.5,0.5,0.5).
-
-    x: (..., 4) or (4,)
-    returns: scalar if input is (4,), or (N,) if input is (N, 4).
-    """
-    x = jnp.atleast_2d(x)  # (N, 4)
-    vals = jax.vmap(lambda y: _ex_sol_rpow4d_single(y, alpha))(x)  # (N,)
-    return vals if vals.shape[0] > 1 else vals[0]
-
-def _laplacian_rpow4d_single(x, alpha=.6):
-    """
-    Compute Δu(x) via trace(Hessian) for the r^alpha * sin(...) solution.
-    x: (4,)
-    """
-    def u_fun(z):
-        return _ex_sol_rpow4d_single(z, alpha)
-
-    H = jax.hessian(u_fun)(x)  # (4, 4)
-    return jnp.trace(H)
-
-def f_rpow4d(x, alpha=.6):
-    r"""
-    RHS for the semilinear 4D Poisson-type PDE:
-        -Δu(x) + λ u(x)^3 = f(x),
-
-    with
-        u(x) = ||x - x0||^alpha * Π_i sin(pi x_i),  x0 = (0.5,...,0.5).
-
-    x: (..., 4) or (4,)
-    returns: scalar if input is (4,), or (N,) if input is (N, 4)
-    """
-    x = jnp.atleast_2d(x)  # (N, 4)
-
-    def f_single(y):
-        u = _ex_sol_rpow4d_single(y, alpha)
-        lap_u = _laplacian_rpow4d_single(y, alpha)
-        return -lap_u + u**3
-
-    vals = jax.vmap(f_single)(x)  # (N,)
-    return vals if vals.shape[0] > 1 else vals[0]
-
 
 
 
@@ -565,6 +649,7 @@ class PDE:
             anisotropic=kcfg.get("anisotropic", False),
             mask=p.mask,
             D=p.D,
+            eps_diff=p.eps_diff
         ),
         'matern32': lambda kcfg, p: SemiLinearHighDimMaternKernel(
             d=p.d,
@@ -575,33 +660,33 @@ class PDE:
             anisotropic=kcfg.get("anisotropic", False),
             mask=p.mask,
             D=p.D,
+            eps_diff=p.eps_diff
         ),
     }
 
 
     EXACT_SOL_REGISTRY = {
-            "sum":{
-                'f': f_sum,
-                'ex_sol': ex_sol_sum
-            },
-            
-            "prod": {
-                'f': f_prod,
-                'ex_sol': ex_sol_prod
-            },
-            "high_freq": {
-                'f': f_high_freq,
-                'ex_sol': f_high_freq
-            },
-            "multiscale": {
-                'f': f_multiscale,
-                'ex_sol': ex_sol_multiscale
-            },
-            "rpow4d": {
-                'f': f_rpow4d,
-                'ex_sol': ex_sol_rpow4d
-            },
-        }
+        'tanh4d': {
+            'ex_sol': ex_sol_tanh4d,
+            'f': f_tanh4d   
+        },
+        'sine_easy': {
+            'ex_sol': ex_sol_sine_easy,
+            'f': f_sine_easy
+        },
+        'tanh_radial': {
+            'ex_sol': ex_sol_tanh_radial,
+            'f': f_tanh_radial
+        },
+        'tanh_radial_2bump': {
+            'ex_sol': ex_sol_tanh_radial_2bump,
+            'f': f_tanh_radial_2bump
+        },
+        'tanh_grid': {
+            'ex_sol': ex_sol_tanh_grid,
+            'f': f_tanh_grid
+        },
+    }
 
     def __init__(self, pcfg: dict, kcfg: dict):
         """
@@ -624,6 +709,8 @@ class PDE:
         self.D = self.D.at[:, 0].set(-1.0)
         self.D = self.D.at[:, 1].set(1.0)
         self.vol_D = jnp.prod(self.D[:, 1] - self.D[:, 0])
+
+        self.eps_diff = float(pcfg.get("eps_diff", 0.1))
 
         # kernel
         self.kernel = self._build_kernel(kcfg)
@@ -693,7 +780,7 @@ class PDE:
 
         # exact solution and rhs
         self.rhs_type = pcfg.get('rhs_type', 'sines')
-        self._build_exact_sol_rhs(pcfg, self.rhs_type)
+        self._build_exact_sol_rhs(self.rhs_type)
 
     # ---------- helpers ----------
 
@@ -707,16 +794,24 @@ class PDE:
         builder = self.KERNEL_REGISTRY[ktype]
         return builder(kcfg, self)
 
-    def _build_exact_sol_rhs(self, pcfg, ex_sol_key):
-        if ex_sol_key == 'rpow4d':
-            alpha = pcfg.get('rpow4d_alpha', 0.3)
-            self.f = lambda x: f_rpow4d(x, alpha=alpha)
-            self.ex_sol = lambda x: ex_sol_rpow4d(x, alpha=alpha)
+    def _build_exact_sol_rhs(self, ex_sol_key):
         if ex_sol_key in self.EXACT_SOL_REGISTRY:
-            self.f = self.EXACT_SOL_REGISTRY[ex_sol_key]['f']
-            self.ex_sol = self.EXACT_SOL_REGISTRY[ex_sol_key]['ex_sol']
+            entry = self.EXACT_SOL_REGISTRY[ex_sol_key]
+
+            # keys where f/ex_sol expect an `eps` argument matching eps_diff
+            if ex_sol_key in ("tanh4d", "tanh_radial", "tanh_radial_2bump", "tanh_grid"):
+                # for tanh_grid, ex_sol ignores eps but having the same signature is convenient
+                self.f = lambda x: entry["f"](x, eps=self.eps_diff)
+                self.ex_sol = lambda x: entry["ex_sol"](x, eps=self.eps_diff)
+            else:
+                self.f = entry["f"]
+                self.ex_sol = entry["ex_sol"]
         else:
-            raise ValueError(f"Unknown exact_solution key '{ex_sol_key}'. Available: {list(self.EXACT_SOL_REGISTRY.keys())}")
+            raise ValueError(
+                f"Unknown exact_solution key '{ex_sol_key}'. "
+                f"Available: {list(self.EXACT_SOL_REGISTRY.keys())}"
+            )
+
 
     # ---------- PDE interface ----------
 

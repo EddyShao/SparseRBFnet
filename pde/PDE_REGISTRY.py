@@ -5,6 +5,7 @@ from src.config.base_config import Config
 from pde.SemiLinearPDE import PDE as SemiLinearPDE
 from pde.SemiLinearHighDim import PDE as SemiLinearHighDim
 from pde.BiLapHighDim import PDE as BiLapHighDim
+from pde.ACSteadyState import PDE as ACSteadyState
 # from pde.OtherPDE import PDE as OtherPDE  # add if/when needed
 
 
@@ -12,6 +13,7 @@ PDE_CLASS_REGISTRY: Dict[str, Type] = {
     "SemiLinearPDE": SemiLinearPDE,
     "SemiLinearHighDim": SemiLinearHighDim,
     "BiLapHighDim": BiLapHighDim,
+    "ACSteadyState": ACSteadyState,
 }
 
 

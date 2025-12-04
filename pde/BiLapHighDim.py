@@ -209,174 +209,238 @@ class BiLapGaussianHighDim(GaussianKernel):
         
         return u_val * temp
     
+
+class BiLapMaternHighDim(MaternKernel):
+    """
+    High-dimensional Matérn kernel with hard-coded Laplacian and bi-Laplacian
+    (via radial formulas + autodiff) for the semilinear bi-Laplacian PDE:
+        E(u) = -Δ^2 u + u^3.
+    """
+
+    def __init__(
+        self,
+        d: int,
+        nu: float,
+        sigma_max: float,
+        sigma_min: float,
+        power: float = None,
+        anisotropic: bool = False,
+        mask: bool = False,
+        D: jnp.ndarray = None,
+    ):
+        if power is None:
+            # roughly "PDE-balanced" for 4th-order; feel free to tweak
+            power = d + 4.01
+
+        super().__init__(
+            nu=nu,
+            d=d,
+            sigma_max=sigma_max,
+            sigma_min=sigma_min,
+            power=power,
+        )
+        self.anisotropic = anisotropic
+        self.mask = mask
+        self.D = D
+
+        # linear results for computing E and B
+        # here E uses Bi-Laplacian, B uses identity + Laplacian (aux)
+        self.linear_E = (self.kappa_X_c_Xhat, self.BiLap_kappa_X_c_Xhat)
+        self.linear_B = (self.kappa_X_c_Xhat, self.Lap_kappa_X_c_Xhat)
+
+        # flags for derivative structures used in your solver
+        self.DE = (0,)
+        self.DB = ()
+
+    # -------- basic helpers: radial φ(r; ℓ), Lap φ, Δ² φ --------
+
+    def _phi_radial(self, r, ell):
+        """φ(r; ell) as a scalar radial function (used for autodiff)."""
+        base = self._matern_shape_iso(r, ell)
+        factor = self._factor(ell)
+        return factor * base
+
+    def _phi_radial_first_second(self, r, ell):
+        """Return φ'(r), φ''(r) via autodiff in the scalar r."""
+        def f(rr):
+            return self._phi_radial(rr, ell)
+
+        f1 = jax.grad(f)(r)
+        f2 = jax.grad(jax.grad(f))(r)
+        return f1, f2
+
+    def _radial_laplacian(self, r, ell):
+        """
+        Δφ(|x|) for a radial φ(|x|) in R^d:
+            Δφ(r) = φ''(r) + (d-1)/r φ'(r),
+        with a careful limit at r = 0.
+        """
+        f1, f2 = self._phi_radial_first_second(r, ell)
+        eps = 1e-8
+
+        # general formula
+        lap = f2 + (self.d - 1.0) * f1 / (r + eps)
+
+        # limit r -> 0: Δφ(0) = d * φ''(0)
+        lap0 = self.d * f2
+        return jnp.where(r < eps, lap0, lap)
+
+    def _radial_bilaplacian(self, r, ell):
+        """
+        Δ²φ(|x|) = Δ(Δφ(|x|)), again using radial formula + autodiff in r.
+        """
+        def g(rr):
+            return self._radial_laplacian(rr, ell)
+
+        g1 = jax.grad(g)(r)
+        g2 = jax.grad(jax.grad(g))(r)
+        eps = 1e-8
+
+        bilap = g2 + (self.d - 1.0) * g1 / (r + eps)
+        bilap0 = self.d * g2
+        return jnp.where(r < eps, bilap0, bilap)
+
+    # -------- basic kernel evals over X / Xhat (if not already from _Kernel) --------
+
+    @partial(jax.jit, static_argnums=(0,))
+    def kappa_X(self, X, S, xhat):
+        """
+        φ(X_i, S_i; x̂) over centers X (N,d) for a single evaluation point xhat (d,).
+        """
+        return jax.vmap(self.kappa, in_axes=(0, 0, None))(X, S, xhat)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def kappa_X_c(self, X, S, c, xhat):
+        """
+        Sum_i c_i φ(X_i, S_i; x̂).
+        """
+        phis = self.kappa_X(X, S, xhat)  # (Ncenters,)
+        return jnp.dot(c, phis)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def kappa_X_c_Xhat(self, X, S, c, Xhat):
+        """
+        Vectorized over x̂ ∈ Xhat, shape (Ntest, d).
+        """
+        return jax.vmap(self.kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
+
+    # -------- Laplacian / bi-Laplacian of expansion --------
+
+    @partial(jax.jit, static_argnums=(0,))
+    def Lap_kappa_X_c(self, X, S, c, xhat):
+        """
+        Δ_{x̂} (sum_i c_i κ(X_i, S_i; x̂)).
+        """
+        diff = X - xhat                      # (Ncenters, d)
+        r = jnp.linalg.norm(diff, axis=1)    # (Ncenters,)
+        ell = self.sigma(S).squeeze()        # (Ncenters,)
+
+        lap_phis = jax.vmap(self._radial_laplacian, in_axes=(0, 0))(r, ell)
+        return jnp.dot(c, lap_phis)          # scalar
+
+    @partial(jax.jit, static_argnums=(0,))
+    def BiLap_kappa_X_c(self, X, S, c, xhat):
+        """
+        Δ^2_{x̂} (sum_i c_i κ(X_i, S_i; x̂)).
+        """
+        diff = X - xhat
+        r = jnp.linalg.norm(diff, axis=1)
+        ell = self.sigma(S).squeeze()
+
+        bilap_phis = jax.vmap(self._radial_bilaplacian, in_axes=(0, 0))(r, ell)
+        return jnp.dot(c, bilap_phis)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def Lap_kappa_X_c_Xhat(self, X, S, c, Xhat):
+        """
+        Vectorized Laplacian over x̂.
+        """
+        return jax.vmap(self.Lap_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def BiLap_kappa_X_c_Xhat(self, X, S, c, Xhat):
+        """
+        Vectorized bi-Laplacian over x̂.
+        """
+        return jax.vmap(self.BiLap_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
+
+    # ------------ PDE operators E, B ------------
+
+    @partial(jax.jit, static_argnums=(0,))
+    def E_kappa_X_c(self, X, S, c, xhat):
+        """
+        E(u) = -Δ^2 u + u^3 applied to kernel expansion.
+        """
+        u_val = self.kappa_X_c(X, S, c, xhat)
+        bilap_u = self.BiLap_kappa_X_c(X, S, c, xhat)
+        return -bilap_u + u_val**3
+
+    @partial(jax.jit, static_argnums=(0,))
+    def B_kappa_X_c(self, X, S, c, xhat):
+        """
+        Boundary operator B(u).
+        For now: identity (Dirichlet).
+        """
+        return self.kappa_X_c(X, S, c, xhat)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def B_aux_kappa_X_c(self, X, S, c, xhat):
+        """
+        Auxiliary operator for boundary derivative computations.
+        Here: Laplacian of u at boundary points.
+        """
+        return self.Lap_kappa_X_c(X, S, c, xhat)
+
+    # "vectorized" versions using precomputed linear results
+    def E_kappa_X_c_Xhat(self, *linear_results):
+        # linear_results = (kappa_X_c_Xhat, BiLap_kappa_X_c_Xhat)
+        u_vals, bilap_u_vals = linear_results
+        return -bilap_u_vals + u_vals**3
+
+    def B_kappa_X_c_Xhat(self, *linear_results):
+        u_vals, _ = linear_results
+        return u_vals
+
+    def B_aux_kappa_X_c_Xhat(self, *linear_results):
+        """
+        Vectorized auxiliary boundary operator: Laplacian at Xhat.
+        """
+        _, lap_u_vals = linear_results
+        return lap_u_vals
+
+    # ------------ derivatives wrt kernel coefficients ------------
+
+    @partial(jax.jit, static_argnums=(0,))
+    def DE_kappa(self, x, s, xhat, *args):
+        """
+        Local derivative of E(u) wrt a single kernel coefficient (as in your Gaussian version):
+            d/dc [ -Δ^2 u + u^3 ] = -Δ^2 κ + 3 u^2 κ
+        where args[0] is the current u(x̂).
+        """
+        ell = self.sigma(s).squeeze()
+        r = jnp.linalg.norm(x - xhat)
+        bilap_phi = self._radial_bilaplacian(r, ell)
+
+        u_val = self.kappa(x, s, xhat)  # κ(x; x̂)
+        return -bilap_phi + 3.0 * (args[0] ** 2) * u_val
+
+    @partial(jax.jit, static_argnums=(0,))
+    def DB_kappa(self, x, s, xhat, *args):
+        """
+        Derivative of B(u) wrt kernel coefficient (identity here).
+        """
+        return self.kappa(x, s, xhat)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def DB_aux_kappa(self, x, s, xhat, *args):
+        """
+        Derivative of the auxiliary boundary operator (Laplacian) wrt the kernel coefficient:
+            d/dc [Δu] = Δκ.
+        """
+        ell = self.sigma(s).squeeze()
+        r = jnp.linalg.norm(x - xhat)
+        return self._radial_laplacian(r, ell)
     
-
-# class BiLapMaternHighDim(MaternKernel):
-#     """
-#     High-dimensional Matérn(ν=3/2) kernel with analytic Laplacian for
-#     the semilinear PDE E(u) = -Δu + u^3.
-
-#     Assumes:
-#       - Base MaternKernel implements:
-#           * self.kappa(x, s, xhat)        # scalar
-#           * self.kappa_X(X, S, xhat)      # (N_centers,)
-#           * self.sigma(S)                 # length scale(s)
-#       - self.d is the spatial dimension.
-#     """
-
-#     def __init__(self, d, power, sigma_max, sigma_min,
-#                  anisotropic=False, mask=False, D=None, nu=1.5):
-#         """
-#         Parameters
-#         ----------
-#         d : int
-#             Spatial dimension.
-#         power : float
-#             Your usual 'power' parameter (you already pass this to MaternKernel).
-#         sigma_max, sigma_min : float
-#             Scale range (for self.sigma).
-#         anisotropic : bool
-#             If you want anisotropic sigmas; handled by base MaternKernel.
-#         mask : bool
-#             Whether to enforce zero outside D via a simple box mask.
-#         D : array (d, 2) or None
-#             Domain box [lo_i, hi_i] in each dimension.
-#         nu : float
-#             Matérn smoothness; here we assume ν=1.5.
-#         """
-#         super().__init__(
-#             d=d,
-#             power=power,
-#             sigma_max=sigma_max,
-#             sigma_min=sigma_min,
-#             nu=nu,
-#         )
-#         self.mask = mask
-#         self.D = D
-
-#         # What your PDE expects for semilinear structure:
-#         self.linear_E = (self.kappa_X_c_Xhat, self.Lap_kappa_X_c_Xhat)
-#         self.linear_B = (self.kappa_X_c_Xhat,)
-#         self.DE = (0,)
-#         self.DB = ()
-
-#     # ---------------- core kappa with optional mask ----------------
-
-#     @partial(jax.jit, static_argnums=(0,))
-#     def kappa(self, x, s, xhat):
-#         out = super().kappa(x, s, xhat)
-#         if self.mask and self.D is not None:
-#             mask = jnp.prod(xhat - self.D[:, 0]) * jnp.prod(self.D[:, 1] - xhat)
-#             out = out * mask
-#         return out
-
-
-#     # ---------------- Laplacian: analytic Matérn(ν=3/2) ----------------
-
-#     @partial(jax.jit, static_argnums=(0,))
-#     def Lap_kappa_X_c(self, X, S, c, xhat):
-#         """
-#         Compute Δ_x [ sum_i c_i k(||x - x_i||, σ_i) ] at x = xhat,
-#         using the analytic formula for Matérn(ν=3/2).
-#         """
-#         # diff: (N_centers, d)
-#         diff = X - xhat  # broadcasted
-#         r = jnp.sqrt(jnp.sum(diff ** 2, axis=1)) + jnp.finfo(jnp.float32).eps  # (N_centers,)
-
-#         # length scale(s) from S; same shape as number of centers
-#         ell = self.sigma(S).squeeze()   # (N_centers,)
-
-#         # Matérn(3/2): k(r) = (1 + a r) exp(-a r), with a = sqrt(3)/ell
-#         sqrt3 = jnp.sqrt(3.0)
-#         a = sqrt3 / ell                  # (N_centers,)
-
-#         # φ_i(xhat) from base class (already k(r))
-#         phi = self.kappa_X(X, S, xhat)   # (N_centers,)
-
-#         # Laplacian of φ: Δφ = a^2 * e^{-a r} * (a r - d)
-#         # and e^{-a r} = φ / (1 + a r)
-#         # => Δφ = a^2 * φ * (a r - d) / (1 + a r)
-#         lap_phis = a**2 * phi * (a * r - self.d) / (1.0 + a * r)
-
-#         # sum_i c_i Δφ_i
-#         return jnp.dot(c, lap_phis)
-    
-    
-
-
-#     @partial(jax.jit, static_argnums=(0,))
-#     def Lap_kappa_X_c_Xhat(self, X, S, c, Xhat):
-#         # vectorized over Xhat
-#         return jax.vmap(self.Lap_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
-    
-#     @partial(jax.jit, static_argnums=(0,))
-#     def BiLap_kappa_X_c_Xhat(self, X, S, c, Xhat):
-#         """
-#         Vectorized Bi-Laplacian over Xhat: returns Δ^2 u(Xhat_j) for all j.
-#         """
-#         return jax.vmap(self.BiLap_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
-
-#     # ---------------- PDE operators E, B ----------------
-
-#     @partial(jax.jit, static_argnums=(0,))
-#     def E_kappa_X_c(self, X, S, c, xhat):
-#         # E(u) = -Δu + u^3
-#         return - self.Lap_kappa_X_c(X, S, c, xhat) + self.kappa_X_c(X, S, c, xhat) ** 3
-
-#     @partial(jax.jit, static_argnums=(0,))
-#     def B_kappa_X_c(self, X, S, c, xhat):
-#         # boundary operator is just identity here
-#         return self.kappa_X_c(X, S, c, xhat)
-
-#     def E_kappa_X_c_Xhat(self, *linear_results):
-#         # linear_results = (kappa_X_c_Xhat, Lap_kappa_X_c_Xhat)
-#         return - linear_results[1] + linear_results[0] ** 3
-
-#     def B_kappa_X_c_Xhat(self, *linear_results):
-#         return linear_results[0]
-
-#     # ---------------- derivative wrt kernel parameters ----------------
-
-#     @partial(jax.jit, static_argnums=(0,))
-#     def DE_kappa(self, x, s, xhat, *args):
-#         """
-#         Derivative of E with respect to the kernel parameters (for Gauss-Newton).
-
-#         Uses analytic Δ κ(x, s, xhat), same Matérn(3/2) formula.
-#         args[0] is typically u(xhat) = kappa_X_c(X,S,c,xhat) used in your code.
-#         """
-#         # single-center version of the Laplacian formula
-#         diff = x - xhat
-#         r = jnp.sqrt(jnp.sum(diff ** 2)) + 1e-12
-
-#         ell = self.sigma(s).squeeze()
-#         sqrt3 = jnp.sqrt(3.0)
-#         a = sqrt3 / ell
-
-#         phi = self.kappa(x, s, xhat)  # scalar
-#         lap_phi = a**2 * phi * (a * r - self.d) / (1.0 + a * r)
-
-#         # E φ = -Δφ + (u(x))^3 φ, where u(x) ≈ args[0]
-#         return -lap_phi + 3.0 * (args[0] ** 2) * phi
-
-#     @partial(jax.jit, static_argnums=(0,))
-#     def DB_kappa(self, x, s, xhat, *args):
-#         return self.kappa(x, s, xhat)
-    
-#     @partial(jax.jit, static_argnums=(0,))
-#     def DB_aux_kappa(self, x, s, xhat, *args):
-        
-#         diff = x - xhat
-#         r = jnp.sqrt(jnp.sum(diff ** 2)) + 1e-12
-
-#         ell = self.sigma(s).squeeze()
-#         sqrt3 = jnp.sqrt(3.0)
-#         a = sqrt3 / ell
-
-#         phi = self.kappa(x, s, xhat)  # scalar
-#         lap_phi = a**2 * phi * (a * r - self.d) / (1.0 + a * r)
-
-#         return lap_phi
 
 
 
@@ -433,16 +497,16 @@ class PDE:
             mask=p.mask,
             D=p.D,
         ),
-        # 'matern32': lambda kcfg, p: BiLapMaternHighDim(
-        #     d=p.d,
-        #     power=p.power,
-        #     nu=kcfg.get("nu", 1.5),
-        #     sigma_max=kcfg.get("sigma_max", 1.0),
-        #     sigma_min=kcfg.get("sigma_min", 1e-3),
-        #     anisotropic=kcfg.get("anisotropic", False),
-        #     mask=p.mask,
-        #     D=p.D,
-        # ),
+        'matern52': lambda kcfg, p: BiLapMaternHighDim(
+            d=p.d,
+            power=p.power,
+            nu=kcfg.get("nu", 2.5),
+            sigma_max=kcfg.get("sigma_max", 1.0),
+            sigma_min=kcfg.get("sigma_min", 1e-3),
+            anisotropic=kcfg.get("anisotropic", False),
+            mask=p.mask,
+            D=p.D,
+        ),
     }
 
 

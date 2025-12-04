@@ -5,7 +5,7 @@ import time
 import matplotlib.pyplot as plt
 from datetime import datetime
 from functools import partial
-from ..utils import computeProx, Phi, compute_rhs, compute_y, compute_errors
+from ..utils import computeProx, Phi, compute_rhs_aux, compute_y, compute_errors
 import jax 
 
 # jax.config.update("jax_enable_x64", True)  # Enable 64-bit precision    
@@ -60,7 +60,7 @@ def solve_outer(p, y_ref, alg_opts):
     uk = u0.copy()
 
     phi = Phi(gamma)
-    yk, linear_results_int, linear_results_bnd = compute_rhs(p, uk['x'], uk['s'], uk['u'])
+    yk, linear_results_int, linear_results_bnd = compute_rhs_aux(p, uk['x'], uk['s'], uk['u'])
     norms_c = jnp.abs(uk['u'])
 
     # Compute initial loss, error, and etc.
@@ -121,8 +121,9 @@ def solve_outer(p, y_ref, alg_opts):
         
         Dc_E_kappa = p.kernel.Grad_c_E_kappa_X_c_Xhat(xk, sk, ck, p.xhat_int)
         Dc_B_kappa = p.kernel.Grad_c_B_kappa_X_c_Xhat(xk, sk, ck, p.xhat_bnd)
+        Dc_B_aux_kappa = p.kernel.Grad_c_B_aux_kappa_X_c_Xhat(xk, sk, ck, p.xhat_bnd)
 
-        Gp_c = jnp.vstack([Dc_E_kappa, Dc_B_kappa])
+        Gp_c = jnp.vstack([Dc_E_kappa, Dc_B_kappa, Dc_B_aux_kappa])  # Gradient matrix wrt c
         Gp = Gp_c
         Gp = Gp * suppc[None, :] # only keep the active points 
 
@@ -228,7 +229,7 @@ def solve_outer(p, y_ref, alg_opts):
             qk = qold + theta * dz[:pad_size]
             ck = Prox(qk)
 
-            yk, linear_results_int, linear_results_bnd = compute_rhs(p, xk, sk, ck)
+            yk, linear_results_int, linear_results_bnd = compute_rhs_aux(p, xk, sk, ck)
             misfit = yk - y_ref
             norms_c = jnp.abs(ck)
             j = obj.F(misfit) / alpha + jnp.sum(phi.phi(norms_c))
@@ -258,8 +259,9 @@ def solve_outer(p, y_ref, alg_opts):
 
         K_test_int = p.kernel.DE_kappa_X_Xhat(omegas_x, omegas_s, p.xhat_int, *linear_results_int)
         K_test_bnd = p.kernel.DB_kappa_X_Xhat(omegas_x, omegas_s, p.xhat_bnd, *linear_results_bnd)
-
-        K_test = jnp.vstack([K_test_int, K_test_bnd])
+        K_test_bnd_aux = p.kernel.DB_aux_kappa_X_Xhat(omegas_x, omegas_s, p.xhat_bnd, *linear_results_bnd)
+        
+        K_test = jnp.vstack([K_test_int, K_test_bnd, K_test_bnd_aux])
         eta = (1 / alpha) * K_test.T @ obj.dF(misfit) 
         sh_eta = jnp.abs(Prox(eta)).flatten()
         sh_eta, sorted_ind = jnp.sort(sh_eta)[::-1], jnp.argsort(-sh_eta) 
@@ -308,7 +310,7 @@ def solve_outer(p, y_ref, alg_opts):
         
         # Metropolis-Hastings step
         annealing = - 3 * jnp.log10(alpha) * jnp.max(jnp.abs(misfit)) / (jnp.max(jnp.abs(y_ref))) # A Heuristic annealing coefficient
-        log_prob = -(1.5 * jnp.linalg.norm(tresh, ord=jnp.inf) - max_sh_eta) / (T * annealing**2 + 1e-5)
+        log_prob = -(3 * jnp.linalg.norm(tresh, ord=jnp.inf) - max_sh_eta) / (T * annealing**2 + 1e-5)
         log_prob = jnp.clip(log_prob, -100, 100) 
         MCMC_key, subkey = jax.random.split(MCMC_key) # random key for MCMC
         if jax.random.uniform(subkey) < jnp.exp(log_prob):
@@ -381,7 +383,7 @@ def solve_outer(p, y_ref, alg_opts):
             y_ref = p.f(p.xhat)
             y_ref = y_ref.at[-p.Nx_bnd:].set(p.ex_sol(p.xhat_bnd))
 
-            yk, linear_results_int, linear_results_bnd = compute_rhs(p, xk, sk, ck)
+            yk, linear_results_int, linear_results_bnd = compute_rhs_aux(p, xk, sk, ck)
             misfit = yk - y_ref
             j = obj.F(misfit)/alpha + jnp.sum(phi.phi(norms_c)) 
         
