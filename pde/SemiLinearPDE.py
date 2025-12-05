@@ -280,9 +280,10 @@ class PDE:
                        "s": jnp.zeros((self.init_pad_size, self.dim-self.d)),  
                        "u": jnp.zeros((self.init_pad_size))} 
         # Observation set
-        self.Nobs = pcfg.get('Nobs', 50)
+        self.Nobs_int = pcfg.get('Nobs_int', 28 ** 2)
+        self.Nobs_bnd = pcfg.get('Nobs_bnd', 30 ** 2 - self.Nobs_int) 
 
-        self.xhat_int, self.xhat_bnd = self.sample_obs(self.Nobs, method=pcfg.get('sampling', 'grid'))
+        self.xhat_int, self.xhat_bnd = self.sample_obs(self.Nobs_int, self.Nobs_bnd, method=pcfg.get('sampling', 'grid'))
         self.xhat = jnp.vstack([self.xhat_int, self.xhat_bnd])
         self.Nx_int = self.xhat_int.shape[0]
         self.Nx_bnd = self.xhat_bnd.shape[0]
@@ -291,7 +292,9 @@ class PDE:
         self.obj = Objective(self.Nx_int, self.Nx_bnd, scale=self.scale)
         
         self.Ntest = 100
-        self.test_int, self.test_bnd = self.sample_obs(self.Ntest, method='grid')
+        self.Ntest_int = int((self.Ntest - 2) ** 2)
+        self.Ntest_bnd = self.Ntest ** 2 - self.Ntest_int
+        self.test_int, self.test_bnd = self.sample_obs(self.Ntest_int, self.Ntest_bnd, method='grid')
         self.obj_test = Objective(self.test_int.shape[0], self.test_bnd.shape[0], scale=self.scale)
 
 
@@ -317,14 +320,13 @@ class PDE:
             raise ValueError(f"Unknown exact_solution key '{ex_sol_key}'. Available: {list(self.EXACT_SOL_REGISTRY.keys())}")
 
     
-    def sample_obs(self, Nobs, method='grid'):
+    def sample_obs(self, Nobs_int, Nobs_bnd, method='grid'):
         """
         Samples observations from D
         method: 'uniform' or 'grid'
         """
 
         # obs_int, obs_bnd = sample_cube_obs(self.D, Nobs, method=method)
-        Nobs_int, Nobs_bnd = int((Nobs - 2)**2), 4 * (Nobs - 1)
         obs_int, obs_bnd = sample_cube_obs(self.D, Nobs_int, Nobs_bnd, method=method, rng=self.key)
         return obs_int, obs_bnd
 
