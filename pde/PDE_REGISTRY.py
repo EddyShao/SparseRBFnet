@@ -3,6 +3,7 @@ from typing import Dict, Type
 from src.config.base_config import Config
 
 from pde.SemiLinearPDE import PDE as SemiLinearPDE
+from pde.SemiLinear2DAniso import PDE as SemiLinear2DAniso
 from pde.SemiLinearHighDim import PDE as SemiLinearHighDim
 from pde.BiLapHighDim import PDE as BiLapHighDim
 from pde.ACSteadyState import PDE as ACSteadyState
@@ -12,6 +13,7 @@ from pde.ACSteadyState import PDE as ACSteadyState
 PDE_CLASS_REGISTRY: Dict[str, Type] = {
     "SemiLinearPDE": SemiLinearPDE,
     "SemiLinearHighDim": SemiLinearHighDim,
+    "SemiLinear2DAniso": SemiLinear2DAniso,  
     "BiLapHighDim": BiLapHighDim,
     "ACSteadyState": ACSteadyState,
 }
