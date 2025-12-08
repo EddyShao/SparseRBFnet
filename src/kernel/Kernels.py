@@ -262,10 +262,93 @@ class WendlandKernel(_Kernel):
         return factor * base
     
 
+class GaussianKernel2DAnisotropic(_Kernel):
+    def __init__(self, power=4.5, d=2, sigma_max=1.0, sigma_min=1e-3, anisotropic=True):
+        """
+        Initialize the Gaussian kernel with scale S, power, and dimension d.
+        Args:
+            power (float): Power applied to the scale parameter.
+            d (int): Dimensionality of the data.
+        """
+        super().__init__()
+        self.power = power
+        self.d = d
+        assert self.d == 2, "exact parameterization only support d=2"
+        self.pad_size = 2
+        self.anisotropic = anisotropic
 
+        if self.anisotropic:
+            sigma_max = jnp.array(sigma_max)
+            if sigma_max.shape == ():
+                sigma_max = sigma_max * jnp.ones(d)
+            else:
+                if sigma_max.shape != (d,):
+                    raise ValueError("sigma_max must be a scalar or a vector of length d")
+            self.sigma_max = sigma_max
+
+            self.r_min = 1 / sigma_max
+
+            sigma_min = jnp.array(sigma_min)
+            if sigma_min.shape == ():
+                sigma_min = sigma_min * jnp.ones(d)
+            else:
+                if sigma_min.shape != (d,):
+                    raise ValueError("sigma_min must be a scalar or a vector of length d")
+            self.sigma_min = sigma_min
+
+            self.r_max = 1 / sigma_min
+
+
+        else:
+            assert type(sigma_max) == float or type(sigma_max) == int
+            assert type(sigma_min) == float or type(sigma_min) == int
+            self.sigma_max = sigma_max
+            self.sigma_min = sigma_min
+ 
+        self.linear_E = ()
+        self.linear_B = ()
+        self.DE = ()
+        self.DB = ()
+    
+    def sigma(self, s):
+        # Questions: Do we need to put a scalar here?
+        exp_s = jnp.exp(s)
+        return self.sigma_min + (self.sigma_max - self.sigma_min) * exp_s / (1 + exp_s)
+
+    def R(self, s):
+        """
+        Handles both single (d,d) and batched (...,d,d) cases
+        """
+        assert s.shape[-1] == 3
+
+        # build rotational matrix with the first element being theta
+        theta = s[..., 0]
+        theta = jax.nn.sigmoid(theta) * jnp.pi/2  # map to [0, pi/2]
+        cos_theta = jnp.cos(theta)
+        sin_theta = jnp.sin(theta)
+        Q_theta = jnp.array([[cos_theta, -sin_theta], [sin_theta, cos_theta]])  # shape (..., 2, 2)
+        # scale the two axes with r1 and r2
+        r = self.r_min + (self.r_max - self.r_min) * jax.nn.sigmoid(s[..., 1:])
+        R = Q_theta * r[..., None, :]  # shape (..., 2, 2)
+        return R
+
+
+    # @partial(jax.jit, static_argnums=(0,))  # we will compile it later in the child class
+    def kappa(self, x, s, xhat):
+        """Compute kernel between single points x and xhat."""
+        if self.anisotropic:
+            R = self.R(s)
+            transformed = R @ (x - xhat)
+            squared = jnp.sum(transformed ** 2)
+            det_R = jnp.linalg.det(R)
+            C_R = det_R**(2 - self.power) /  (jnp.sqrt(2 * jnp.pi)  ** self.d)
+            return C_R * jnp.exp(-squared / 2)
+        else:
+            raise ValueError("This piece handles the anisotropic case")
 
 KERNEL_BASE_REGISTRY: Dict[str, Type] = {
     "gaussian": GaussianKernel,
     "wendland": WendlandKernel,
     "matern": MaternKernel,
+    "gaussian2DAniso": GaussianKernel2DAnisotropic,
 }
