@@ -276,16 +276,6 @@ def solve(p, y_ref, alg_opts):
             
             
     
-        omegas_x, omegas_s = p.sample_param(Ntrial)
-
-        K_test_int = p.kernel.DE_kappa_X_Xhat(omegas_x, omegas_s, p.xhat_int, *linear_results_int)
-        K_test_bnd = p.kernel.DB_kappa_X_Xhat(omegas_x, omegas_s, p.xhat_bnd, *linear_results_bnd)
-
-        K_test = jnp.vstack([K_test_int, K_test_bnd])
-        eta = (1 / alpha) * K_test.T @ obj.dF(misfit) 
-        sh_eta = jnp.abs(Prox(eta)).flatten()
-        sh_eta, sorted_ind = jnp.sort(sh_eta)[::-1], jnp.argsort(-sh_eta) 
-        max_sh_eta, ind_max_sh_eta = sh_eta[0], sorted_ind[0]
     
         errors = compute_errors(p, xk, sk, ck)
 
@@ -294,7 +284,7 @@ def solve(p, y_ref, alg_opts):
             dz_norm = jnp.linalg.norm(dz, jnp.inf) if dz.size > 0 else 0.0
             print(f"Time: {time.time() - start_time:.2f}s CGNAP iter: {k}, j={j:.6f}, supp={jnp.sum(suppc)}), "
                 f"desc={descent:.1e}, dz={dz_norm:.1e}, "
-                f"viol={max_sh_eta:.1e}, theta={theta:.1e}")
+                f"theta={theta:.1e}")
             
             print("L_2 error: {L_2:.3e}, L_inf error: {L_inf:.3e}, (int: {L_inf_int:.3e}, bnd: {L_inf_bnd:.3e})".format(**errors))
         
@@ -311,33 +301,13 @@ def solve(p, y_ref, alg_opts):
         alg_out["success"] = True
 
 
-        grad_supp_c = (1 / alpha) * (Gp_c.T @ obj.dF(misfit)) + Dphima(ck).reshape(-1, 1) + (qk - ck).reshape(-1, 1)
-        grad_supp_c = grad_supp_c * suppc[:, None] # only keep the active point
-        tresh_c = jnp.abs(grad_supp_c).T
-
-        grad_supp_y = (1 / alpha) * shape_dK(Gp_xs).T @ obj.dF(misfit)
-        grad_supp_y = grad_supp_y * suppGp[pad_size:, None] # only keep the active points
-        tresh_y = jnp.sqrt(jnp.sum(grad_supp_y.reshape(dim, -1) ** 2, axis=0))
-
-        tresh = tresh_c +  insertion_coef * tresh_y
-        # sort ck&xk's indices first based on tresh
-        sorted_ind = jnp.argsort(-tresh.flatten())
-        tresh = tresh[0, sorted_ind]
-        ck = ck[sorted_ind]
-        qk = qk[sorted_ind]
-        xk = xk[sorted_ind]
-        sk = sk[sorted_ind] if sk.ndim == 1 else sk[sorted_ind, :]
-        suppc = suppc[sorted_ind]
-        suppGp = jnp.tile(suppc, dim+1)
-
-
 
         # Metropolis-Hastings step
         annealing = - 3 * jnp.log10(alpha) * jnp.max(jnp.abs(misfit)) / (jnp.max(jnp.abs(y_ref))) # A Heuristic annealing coefficient
-        log_prob = -(jnp.linalg.norm(tresh, ord=jnp.inf) - max_sh_eta) / (T * annealing**2 + 1e-5)
+        log_prob = - 1 / (T * annealing**2 + 1e-5)
         log_prob = jnp.clip(log_prob, -100, 100) 
         MCMC_key, subkey = jax.random.split(MCMC_key) # random key for MCMC
-        if jax.random.uniform(subkey) < jnp.exp(log_prob):
+        if jax.random.uniform(subkey) < jnp.exp(log_prob) or k < 100:
             if jnp.sum(suppc) == pad_size:
                 idx = pad_size
                 pad_size_id += 1
@@ -359,31 +329,37 @@ def solve(p, y_ref, alg_opts):
 
             suppc = suppc.at[idx].set(True)
             suppGp = jnp.tile(suppc, dim+1)
-            qk = qk.at[idx].set(-jnp.sign(eta[ind_max_sh_eta])[0])  # insert a new point
-            xk = xk.at[idx, :].set(omegas_x[ind_max_sh_eta, :])
-            if sk.ndim == 1:
-                sk = sk.at[idx].set(omegas_s[ind_max_sh_eta])
+            omegas_x, omegas_s = p.sample_param(1)
+            # generate +-1 initial guess for the new point
+            if jax.random.uniform(subkey) < 0.5:
+                omegas_c = 1.0
             else:
-                sk = sk.at[idx, :].set(omegas_s[ind_max_sh_eta, :])
+                omegas_c = -1.0
+            qk = qk.at[idx].set(omegas_c)  # insert a new point
+            xk = xk.at[idx, :].set(omegas_x[0, :])
+            if sk.ndim == 1:
+                sk = sk.at[idx].set(omegas_s[0])
+            else:
+                sk = sk.at[idx, :].set(omegas_s[0, :])
 
 
-            print(f"  INSERT: viol={max_sh_eta:.2e}, |g_c|+|g_y|={jnp.max(tresh_c, initial=0):.1e}+{jnp.max(tresh_y, initial=0):.1e}, "
+            print(f"  INSERT one random point; "
                 f"supp:({jnp.sum(suppc)-1}->{jnp.sum(suppc)})")
 
         # Plot results
         if k % plot_every == 0:            
             p.plot_forward(xk, sk, ck, suppc)
 
-        # Stopping criterion
-        if jnp.abs(pred * theta) < (TOL / alpha) and  max_sh_eta < (TOL / alpha):
-            dz_norm = jnp.linalg.norm(dz, jnp.inf) if dz.size > 0 else 0.0  
-            print(f"Time: {time.time() - start_time:.2f}s CGNAP iter: {k}, j={j:.6f}, supp=({jnp.sum(suppc)}), "
-                f"desc={descent:.1e}, dz={dz_norm:.1e}, "
-                f"viol={max_sh_eta:.1e}, theta={theta:.1e}")
+        # # Stopping criterion
+        # if jnp.abs(pred * theta) < (TOL / alpha) :
+        #     dz_norm = jnp.linalg.norm(dz, jnp.inf) if dz.size > 0 else 0.0  
+        #     print(f"Time: {time.time() - start_time:.2f}s CGNAP iter: {k}, j={j:.6f}, supp=({jnp.sum(suppc)}), "
+        #         f"desc={descent:.1e}, dz={dz_norm:.1e}, "
+        #         f"theta={theta:.1e}")
             
-            print("L_2 error: {L_2:.3e}, L_inf error: {L_inf:.3e}, (int: {L_inf_int:.3e}, bnd: {L_inf_bnd:.3e})".format(**errors))   
-            print(f"Converged in {k} iterations")
-            break
+        #     print("L_2 error: {L_2:.3e}, L_inf error: {L_inf:.3e}, (int: {L_inf_int:.3e}, bnd: {L_inf_bnd:.3e})".format(**errors))   
+        #     print(f"Converged in {k} iterations")
+        #     break
 
 
         if jnp.sum(suppc) < pad_size // 3 and k >= 100:
@@ -396,12 +372,15 @@ def solve(p, y_ref, alg_opts):
                 recompile = True
             else:
                 recompile = False
+            pad_size = pad_size_dict[pad_size_id]
+
             # prune ck, sk, qk, xk, suppc
             ck = ck[suppc]
             qk = qk[suppc]
             sk = sk[suppc, :]
             xk = xk[suppc, :]
             suppc = suppc[suppc]
+            print(len(ck))
             # pad the arrays to pad_size
             ck = jnp.pad(ck, (0, pad_size - len(ck)), constant_values=0.)
             qk = jnp.pad(qk, (0, pad_size - len(qk)), constant_values=0.)
