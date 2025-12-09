@@ -156,7 +156,7 @@ class PDE:
         self.power=pcfg.get('power', 4.01)
         self.epsilon = pcfg.get('epsilon', 0.1) # diffusion coefficient
 
-        self.d = 2  # spatial dimension
+        self.d = pcfg.get('d', 2)  # spatial dimension
         
         
         self.scale = pcfg.get('scale', 1.0) 
@@ -166,11 +166,11 @@ class PDE:
         self.key = jax.random.PRNGKey(self.seed)
 
         # domain for the input weights
-        self.D = jnp.array([
-                [-1., 1.],
-                [-1., 1.],
-        ])
-
+        # self.D = jnp.array([
+        #         [-1., 1.],
+        #         [-1., 1.],
+        # ])
+        self.D = jnp.stack([jnp.array([-1.0, 1.0]) for _ in range(self.d)])
         self.vol_D = jnp.prod(self.D[:, 1] - self.D[:, 0])
 
 
@@ -183,16 +183,17 @@ class PDE:
             self.dim = self.d + 1
 
 
-        self.Omega = jnp.array([
-            [-2.0, 2.0],
-            [-2.0, 2.0],
-            [-10.0, 0.0],
-        ])
+        # self.Omega = jnp.array([
+        #     [-2.0, 2.0],
+        #     [-2.0, 2.0],
+        #     [-10.0, 0.0],
+        # ])
+        self.Omega = jnp.vstack([jnp.array([-2.0, 2.0]) for _ in range(self.d)] + [jnp.array([-10.0, 0.0])])
         
         if kcfg.get('anisotropic', False):
             self.Omega = jnp.vstack([self.Omega[:self.d, :], jnp.tile(self.Omega[self.d, :], (self.d, 1))])
 
-        assert self.dim == self.Omega.shape[0] and self.d == self.Omega.shape[1]
+        assert self.dim == self.Omega.shape[0] 
 
 
         self.u_zero = {"x": jnp.zeros((self.init_pad_size, self.d)), 
@@ -267,8 +268,10 @@ class PDE:
         return randomx, randoms
 
     def plot_forward(self, x, s, c, suppc=None):
-
-        plot_solution_2d(self, x, s, c, suppc=suppc)
+        if self.d == 2:
+            plot_solution_2d(self, x, s, c, suppc=suppc)
+        else:
+            pass
 
 
 

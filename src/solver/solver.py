@@ -342,7 +342,7 @@ def solve(p, y_ref, alg_opts):
                 idx = pad_size
                 pad_size_id += 1
                 if pad_size_id not in pad_size_dict:
-                    pad_size_dict[pad_size_id] = max(pad_size * 2, alg_opts.get('init_pad_size', 128))
+                    pad_size_dict[pad_size_id] = max(pad_size * 2, pad_size_dict[0])
                     recompile = True
                 else:
                     recompile = False
@@ -387,6 +387,7 @@ def solve(p, y_ref, alg_opts):
 
 
         if jnp.sum(suppc) < pad_size // 3 and k >= 100:
+            print(pad_size_dict)
             pad_size_id -= 1
             if pad_size_id not in pad_size_dict:
                 pad_size_dict[pad_size_id] = max(pad_size // 2, 1)
@@ -396,6 +397,7 @@ def solve(p, y_ref, alg_opts):
                 recompile = True
             else:
                 recompile = False
+            pad_size = pad_size_dict[pad_size_id]
             # prune ck, sk, qk, xk, suppc
             ck = ck[suppc]
             qk = qk[suppc]
