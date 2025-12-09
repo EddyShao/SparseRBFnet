@@ -8,6 +8,8 @@ from typing import Dict, Callable, Any
 import jax
 import jax.numpy as jnp
 from functools import partial
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 class SemiLinearKernelMixin:
     """
@@ -262,15 +264,22 @@ class PDE:
         )
 
         # exact solution & RHS
-        self.rhs_type = pcfg.get("rhs_type", "aniso_1d")
+        self.rhs_type = pcfg.get("rhs_type", "anisoSines")
         self._build_exact_sol_rhs(self.rhs_type)
 
-        # ------------------------------------------------------------------
-        # Kernel placeholder
-        # ------------------------------------------------------------------
-        # you can later attach a kernel manually:
-        #   self.kernel = YourKernel(...)
-        self.kernel = None  # will be set by you
+        self.kernel = self._build_kernel(kcfg)
+    
+
+
+    def _build_kernel(self, kcfg):
+        kernel_type = kcfg.get('type', 'gaussian')
+        if kernel_type not in self.KERNEL_REGISTRY:
+            raise ValueError(
+                f"Unknown kernel_type '{kernel_type}' for SemiLinearPDE. "
+                f"Available: {list(self.KERNEL_REGISTRY.keys())}"
+            )
+        builder = self.KERNEL_REGISTRY[kernel_type]
+        return builder(kcfg, self)
 
     # ------------------------------------------------------------------
     # Exact solution / RHS registry
@@ -340,13 +349,85 @@ class PDE:
     # ------------------------------------------------------------------
     def plot_forward(self, x, s, c, suppc=None):
         """
-        2D visualization (exact vs predicted, error contour).
-
-        Left as a stub here since it depends on how you wire the kernel:
-
-            Gu = self.kernel.gauss_X_c_Xhat(x, s, c, X_eval)
-
-        You can copy your old plot_forward implementation and replace
-        the kernel calls once you hook self.kernel.
+        Plots the forward solution.
         """
-        pass
+        if suppc is None:
+            suppc = np.ones_like(c, dtype=bool)
+        # assert self.dim == 3 
+
+        # # Extract the domain range
+        # pO = self.Omega[:-1, :]
+        plt.close('all')  # Close previous figure to prevent multiple windows
+
+        # Create a new figure
+        fig = plt.figure(figsize=(15, 5))
+        ax1 = fig.add_subplot(131, projection='3d')
+        ax2 = fig.add_subplot(132, projection='3d')
+        ax3 = fig.add_subplot(133)
+
+        t_x = np.linspace(self.D[0, 0], self.D[0, 1], 100)
+        t_y = np.linspace(self.D[1, 0], self.D[1, 1], 100)
+        X, Y = np.meshgrid(t_x, t_y)
+        t = np.vstack((X.flatten(), Y.flatten())).T
+
+        if self.ex_sol is not None:
+            f1 = self.ex_sol(t).reshape(X.shape)
+        # Plot exact solution
+        surf1 = ax1.plot_surface(X, Y, f1, cmap='viridis', edgecolor='none')
+        ax1.set_title("Exact Solution")
+        ax1.set_xlabel("X-axis")
+        ax1.set_ylabel("Y-axis")
+        fig.colorbar(surf1, ax=ax1, shrink=0.5, aspect=5)
+
+        # Compute predicted solution
+        Gu = self.kernel.kappa_X_c_Xhat(x, s, c, t)
+        # sigma is sigmoid of S
+
+        # Plot predicted solution
+        surf2 = ax2.plot_surface(X, Y, Gu.reshape(X.shape), cmap='viridis', edgecolor='none')
+        ax2.set_title("Predicted Solution") 
+        ax2.set_xlabel("X-axis")
+        ax2.set_ylabel("Y-axis")
+        ax2.set_zlabel("$f_2(x, y)$")
+        fig.colorbar(surf2, ax=ax2, shrink=0.5, aspect=5)
+
+
+        # plot all collocation point X
+        # together with error countour plot
+        contour = ax3.contourf(X, Y, np.abs(Gu.reshape(100, 100) - f1), cmap='viridis')        
+        # ax3.scatter(x[:, 0].flatten(), x[:, 1].flatten(), color='r', marker='x')
+        if self.anisotropic:
+            # Get per-center R (shape: (N, 2, 2)); convert to numpy for matplotlib
+            
+            for i, (xi, yi) in enumerate(x[:, :2]):
+                if suppc is not None and not bool(suppc[i]):
+                    continue
+                # Extract the i-th R matrix
+                s_i = s[i]
+                r1 = self.kernel.r_min[0] + (self.kernel.r_max[0] - self.kernel.r_min[0]) * jax.nn.sigmoid(s_i[1])
+                r2 = self.kernel.r_min[1] + (self.kernel.r_max[1] - self.kernel.r_min[1]) * jax.nn.sigmoid(s_i[2])
+                a1, a2 = 1.0 / r1, 1.0 / r2  # Semi-major and semi-minor axes lengths
+
+                # Rotation angle in degrees from x-axis
+                angle_deg = -np.degrees(jax.nn.sigmoid(s_i[0]))  # Map to [0, 90]
+
+                # Draw ellipse and center
+                ell = patches.Ellipse((xi, yi),
+                                    width=2*a1, height=2*a2, angle=angle_deg,
+                                    edgecolor='r', facecolor='none',
+                                    linestyle='dashed', linewidth=1, label="Reference ellipse")
+                ax3.add_patch(ell)
+                ax3.scatter(xi, yi, color='r', marker='x')
+        else:
+            raise NotImplementedError("only handles anisotropic case")
+
+        ax3.set_aspect('equal')  # Ensures circles are properly shaped
+        # # set colorbars
+        ax3.set_xlim(self.Omega[0, 0], self.Omega[0, 1])
+        ax3.set_ylim(self.Omega[1, 0], self.Omega[1, 1])
+        ax3.set_title("Collocation Points, Error Contour") 
+        fig.colorbar(contour, ax=ax3, shrink=0.5, aspect=5)   
+
+        plt.show(block=False)
+        plt.pause(1.0)  
+        

@@ -7,6 +7,7 @@ from pde.SemiLinear2DAniso import PDE as SemiLinear2DAniso
 from pde.SemiLinearHighDim import PDE as SemiLinearHighDim
 from pde.BiLapHighDim import PDE as BiLapHighDim
 from pde.ACSteadyState import PDE as ACSteadyState
+from pde.Eikonal import PDE as EikonalPDE  # add if/when needed
 # from pde.OtherPDE import PDE as OtherPDE  # add if/when needed
 
 
@@ -16,6 +17,7 @@ PDE_CLASS_REGISTRY: Dict[str, Type] = {
     "SemiLinear2DAniso": SemiLinear2DAniso,  
     "BiLapHighDim": BiLapHighDim,
     "ACSteadyState": ACSteadyState,
+    "Eikonal": EikonalPDE,
 }
 
 
