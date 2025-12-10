@@ -7,7 +7,7 @@ import jax.numpy as jnp
 from functools import partial
 from typing import Dict, Callable, Any
 
-from src.kernel.Kernels import GaussianKernel, MaternKernel  # you can add Wendland/Matern later if desired
+from src.kernel.Kernels import GaussianKernel, MaternKernel, WendlandKernel  # you can add Wendland/Matern later if desired
 from src.utils import Objective, sample_cube_obs
 
 # jax.config.update("jax_enable_x64", True)
@@ -440,8 +440,273 @@ class BiLapMaternHighDim(MaternKernel):
         ell = self.sigma(s).squeeze()
         r = jnp.linalg.norm(x - xhat)
         return self._radial_laplacian(r, ell)
-    
 
+
+class BiLapWendlandHighDim(WendlandKernel):
+    r"""
+    High-dimensional Wendland kernel with hard-coded Laplacian and bi-Laplacian
+    for the semilinear bi-Laplacian PDE:
+        E(u) = -Δ^2 u + u^3.
+
+    Uses radial derivatives w.r.t. r = ||x - x̂||, exactly like the Matérn version,
+    but with your Wendland ψ_{d,k}.
+    """
+
+    def __init__(
+        self,
+        d: int,
+        k: int,
+        sigma_max: float,
+        sigma_min: float,
+        power: float = None,
+        anisotropic: bool = False,
+        mask: bool = False,
+        D: jnp.ndarray = None,
+    ):
+        if power is None:
+            # reasonable default for 4th-order PDEs
+            power = d + 4.01
+
+        super().__init__(
+            d=d,
+            k=k,
+            sigma_max=sigma_max,
+            sigma_min=sigma_min,
+            power=power,
+        )
+
+        self.anisotropic = anisotropic
+        self.mask = mask
+        self.D = D
+
+        # linear results for computing E and B:
+        #   E uses Bi-Laplacian
+        #   B uses identity + Laplacian (aux)
+        self.linear_E = (self.kappa_X_c_Xhat, self.BiLap_kappa_X_c_Xhat)
+        self.linear_B = (self.kappa_X_c_Xhat, self.Lap_kappa_X_c_Xhat)
+
+        # flags for derivative structures used in your solver
+        self.DE = (0,)
+        self.DB = ()
+
+    # -------- radial φ(r; σ) and its 1D derivatives --------
+
+    def _phi_radial(self, r, sigma):
+        """
+        φ(r; σ) = factor(σ) * ψ_{d,k}(r / σ)
+        This is exactly what WendlandKernel.kappa does, but radialized.
+        """
+        t = r / (sigma + jnp.finfo(float).eps)
+        base = self._wendland_psi(t)      # ψ_{d,k}(t)
+        factor = self._factor(sigma)      # PDE scaling
+        return factor * base
+
+    def _phi_radial_derivs(self, r, sigma):
+        """
+        Return φ'(r), φ''(r), φ'''(r), φ''''(r) w.r.t. scalar r.
+        This is 1D autodiff, not a d×d Hessian.
+        """
+        def f(rr):
+            return self._phi_radial(rr, sigma)
+
+        phi1 = jax.grad(f)(r)
+        phi2 = jax.grad(jax.grad(f))(r)
+        phi3 = jax.grad(jax.grad(jax.grad(f)))(r)
+        phi4 = jax.grad(jax.grad(jax.grad(jax.grad(f))))(r)
+        return phi1, phi2, phi3, phi4
+
+    def _radial_laplacian(self, r, sigma):
+        """
+        Δφ(|x|) for a radial φ(|x|) in R^d:
+            Δφ(r) = φ''(r) + (d-1)/r φ'(r),
+        with limiting behavior at r = 0.
+        """
+        d = float(self.d)
+        eps = 1e-8
+        r_safe = jnp.where(r < eps, eps, r)
+
+        phi1, phi2, _, _ = self._phi_radial_derivs(r, sigma)
+
+        lap_general = phi2 + (d - 1.0) * phi1 / r_safe
+
+        # limit r → 0: Δφ(0) = d * φ''(0)
+        lap0 = d * phi2
+        return jnp.where(r < eps, lap0, lap_general)
+
+    def _radial_bilaplacian(self, r, sigma):
+        """
+        Δ²φ(|x|) = Δ(Δφ(|x|)) in R^d, using radial derivatives.
+        Formula:
+            Δ²u = u'''' + 2(d-1)/r u''' + (d-1)(d-3)/r^2 u''
+                   - (d-1)(d-3)/r^3 u'
+        with limits at r = 0.
+        """
+        d = float(self.d)
+        eps = 1e-8
+        r_safe = jnp.where(r < eps, eps, r)
+
+        phi1, phi2, phi3, phi4 = self._phi_radial_derivs(r, sigma)
+
+        bilap_general = (
+            phi4
+            + 2.0 * (d - 1.0) * phi3 / r_safe
+            + (d - 1.0) * (d - 3.0) * phi2 / (r_safe**2)
+            - (d - 1.0) * (d - 3.0) * phi1 / (r_safe**3)
+        )
+
+        # radial limits at r = 0:
+        # Δu(0)   = d * u''(0)
+        # Δ²u(0)  = d(d+2)/3 * u''''(0)
+        bilap0 = d * (d + 2.0) / 3.0 * phi4
+        return jnp.where(r < eps, bilap0, bilap_general)
+
+    # -------- basic kernel evals over X / Xhat --------
+
+    @partial(jax.jit, static_argnums=(0,))
+    def kappa_X(self, X, S, xhat):
+        """
+        φ(X_i, S_i; x̂) over centers X (N,d) for a single evaluation point xhat (d,).
+        """
+        return jax.vmap(self.kappa, in_axes=(0, 0, None))(X, S, xhat)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def kappa_X_c(self, X, S, c, xhat):
+        """
+        Sum_i c_i φ(X_i, S_i; x̂).
+        """
+        phis = self.kappa_X(X, S, xhat)  # (Ncenters,)
+        return jnp.dot(c, phis)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def kappa_X_c_Xhat(self, X, S, c, Xhat):
+        """
+        Vectorized over x̂ ∈ Xhat, shape (Ntest, d).
+        """
+        return jax.vmap(self.kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
+
+    # -------- Laplacian / bi-Laplacian of expansion (radial) --------
+
+    @partial(jax.jit, static_argnums=(0,))
+    def Lap_kappa_X_c(self, X, S, c, xhat):
+        """
+        Δ_{x̂} (sum_i c_i κ(X_i, S_i; x̂)).
+        """
+        diff = X - xhat                      # (Ncenters, d)
+        r = jnp.linalg.norm(diff, axis=1)    # (Ncenters,)
+        sigma = self.sigma(S).squeeze()      # (Ncenters,)
+
+        lap_phis = jax.vmap(self._radial_laplacian, in_axes=(0, 0))(r, sigma)
+        return jnp.dot(c, lap_phis)          # scalar
+
+    @partial(jax.jit, static_argnums=(0,))
+    def BiLap_kappa_X_c(self, X, S, c, xhat):
+        """
+        Δ^2_{x̂} (sum_i c_i κ(X_i, S_i; x̂)).
+        """
+        diff = X - xhat
+        r = jnp.linalg.norm(diff, axis=1)
+        sigma = self.sigma(S).squeeze()
+
+        bilap_phis = jax.vmap(self._radial_bilaplacian, in_axes=(0, 0))(r, sigma)
+        return jnp.dot(c, bilap_phis)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def Lap_kappa_X_c_Xhat(self, X, S, c, Xhat):
+        """
+        Vectorized Laplacian over x̂.
+        """
+        return jax.vmap(self.Lap_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def BiLap_kappa_X_c_Xhat(self, X, S, c, Xhat):
+        """
+        Vectorized bi-Laplacian over x̂.
+        """
+        return jax.vmap(self.BiLap_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
+
+    # ------------ PDE operators E, B ------------
+
+    @partial(jax.jit, static_argnums=(0,))
+    def E_kappa_X_c(self, X, S, c, xhat):
+        """
+        E(u) = -Δ^2 u + u^3 applied to kernel expansion.
+        """
+        u_val = self.kappa_X_c(X, S, c, xhat)
+        bilap_u = self.BiLap_kappa_X_c(X, S, c, xhat)
+        return -bilap_u + u_val**3
+
+    @partial(jax.jit, static_argnums=(0,))
+    def B_kappa_X_c(self, X, S, c, xhat):
+        """
+        Boundary operator B(u).
+        For now: identity (Dirichlet).
+        """
+        return self.kappa_X_c(X, S, c, xhat)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def B_aux_kappa_X_c(self, X, S, c, xhat):
+        """
+        Auxiliary operator for boundary derivative computations.
+        Here: Laplacian of u at boundary points.
+        """
+        return self.Lap_kappa_X_c(X, S, c, xhat)
+
+    # "vectorized" versions using precomputed linear results
+    def E_kappa_X_c_Xhat(self, *linear_results):
+        # linear_results = (kappa_X_c_Xhat, BiLap_kappa_X_c_Xhat)
+        u_vals, bilap_u_vals = linear_results
+        return -bilap_u_vals + u_vals**3
+
+    def B_kappa_X_c_Xhat(self, *linear_results):
+        u_vals, _ = linear_results
+        return u_vals
+
+    def B_aux_kappa_X_c_Xhat(self, *linear_results):
+        """
+        Vectorized auxiliary boundary operator: Laplacian at Xhat.
+        """
+        _, lap_u_vals = linear_results
+        return lap_u_vals
+
+    # ------------ derivatives wrt a single kernel coefficient ------------
+
+    @partial(jax.jit, static_argnums=(0,))
+    def DE_kappa(self, x, s, xhat, *args):
+        """
+        Local derivative of E(u) wrt a single kernel coefficient:
+
+            d/dc [ -Δ^2 u + u^3 ] = -Δ^2 κ + 3 u(x̂)^2 κ,
+
+        where args[0] is the current u(x̂) (your convention).
+        """
+        diff = x - xhat
+        r = jnp.linalg.norm(diff)
+        sigma = self.sigma(s).squeeze()
+
+        bilap_phi = self._radial_bilaplacian(r, sigma)
+        k_val = self.kappa(x, s, xhat)  # κ(x; x̂)
+
+        return -bilap_phi + 3.0 * (args[0] ** 2) * k_val
+
+    @partial(jax.jit, static_argnums=(0,))
+    def DB_kappa(self, x, s, xhat, *args):
+        """
+        Derivative of B(u) wrt kernel coefficient (identity here).
+        """
+        return self.kappa(x, s, xhat)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def DB_aux_kappa(self, x, s, xhat, *args):
+        """
+        Derivative of the auxiliary boundary operator (Laplacian) wrt the kernel coefficient:
+            d/dc [Δu] = Δκ.
+        """
+        diff = x - xhat
+        r = jnp.linalg.norm(diff)
+        sigma = self.sigma(s).squeeze()
+
+        lap_phi = self._radial_laplacian(r, sigma)
+        return lap_phi
 
 
 def ex_sol_sum (x):
@@ -597,6 +862,16 @@ class PDE:
             nu=kcfg.get("nu", 2.5),
             sigma_max=kcfg.get("sigma_max", 1.0),
             sigma_min=kcfg.get("sigma_min", 1e-3),
+            anisotropic=kcfg.get("anisotropic", False),
+            mask=p.mask,
+            D=p.D,
+        ),
+        'wendland': lambda kcfg, p: BiLapWendlandHighDim(
+            d=p.d,
+            k=kcfg.get("k", 2),
+            sigma_max=kcfg.get("sigma_max", 1.0),
+            sigma_min=kcfg.get("sigma_min", 1e-3),
+            power=p.power,
             anisotropic=kcfg.get("anisotropic", False),
             mask=p.mask,
             D=p.D,
