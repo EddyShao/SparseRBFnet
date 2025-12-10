@@ -468,7 +468,101 @@ def b_sum_aux(x):
     d = x.shape[-1]
     return - (jnp.pi**2 / 4.0) * ex_sol_sum(x)
 
+def _ex_sol_rpow4d_single(x, q=0.6):
+    """
+    x: (4,)
+    returns: scalar u(x) = r(x)^q * prod_i sin(pi x_i),
+    where r(x) = ||x - x0||, x0 = (0.5,...,0.5).
+    """
+    x0 = jnp.array([0.5, 0.5, 0.5, 0.5])
+    r = jnp.linalg.norm(x - x0)
+    s = jnp.prod(jnp.sin(jnp.pi * x))
+    return (r ** q) * s
 
+
+def ex_sol_rpow4d(x, q=0.6):
+    r"""
+    Exact solution in 4D:
+        u(x) = ||x - x0||^q * Π_{i=1}^4 sin(pi x_i),
+    where x0 = (0.5,0.5,0.5,0.5).
+
+    x: (..., 4) or (4,)
+    returns: scalar if input is (4,), or (N,) if input is (N, 4).
+    """
+    x = jnp.atleast_2d(x)  # (N, 4)
+    vals = jax.vmap(lambda y: _ex_sol_rpow4d_single(y, q))(x)  # (N,)
+    return vals if vals.shape[0] > 1 else vals[0]
+
+
+def _laplacian_rpow4d_single(x, q=0.6):
+    """
+    Compute Δu(x) = trace(Hess u(x)) for the r^q * sin(...) solution.
+    x: (4,)
+    """
+    def u_fun(z):
+        return _ex_sol_rpow4d_single(z, q)
+
+    H = jax.hessian(u_fun)(x)  # (4, 4)
+    return jnp.trace(H)
+
+
+def _bilaplacian_rpow4d_single(x, q=0.6):
+    """
+    Compute Δ^2 u(x) = Δ(Δu(x)) for the r^q * sin(...) solution.
+    x: (4,)
+    """
+    def lap_fun(z):
+        # Δu(z)
+        def u_fun_inner(w):
+            return _ex_sol_rpow4d_single(w, q)
+        H = jax.hessian(u_fun_inner)(z)
+        return jnp.trace(H)
+
+    H2 = jax.hessian(lap_fun)(x)  # (4, 4)
+    return jnp.trace(H2)
+
+
+def f_rpow4d_bilap(x, q=0.6):
+    r"""
+    RHS for the semilinear 4D bi-Laplacian PDE:
+        -Δ^2 u(x) + u(x)^3 = f(x),
+
+    with
+        u(x) = ||x - x0||^q * Π_i sin(pi x_i),  x0 = (0.5,...,0.5).
+
+    x: (..., 4) or (4,)
+    returns: scalar if input is (4,), or (N,) if input is (N, 4)
+    """
+    x = jnp.atleast_2d(x)  # (N, 4)
+
+    def f_single(y):
+        u = _ex_sol_rpow4d_single(y, q)
+        bilap_u = _bilaplacian_rpow4d_single(y, q)
+        return -bilap_u + u**3
+
+    vals = jax.vmap(f_single)(x)  # (N,)
+    return vals if vals.shape[0] > 1 else vals[0]
+
+
+def b_rpow4d(x, q=0.6):
+    """
+    Dirichlet boundary data: u|_{∂Ω}.
+    For Ω = (0,1)^4, this is automatically 0 because of sin(pi x_i).
+    """
+    return ex_sol_rpow4d(x, q)
+
+
+def b_rpow4d_aux(x, q=0.6):
+    """
+    Navier-type auxiliary boundary data: (Δu)|_{∂Ω}.
+    """
+    x = jnp.atleast_2d(x)
+
+    def lap_single(y):
+        return _laplacian_rpow4d_single(y, q)
+
+    vals = jax.vmap(lap_single)(x)
+    return vals if vals.shape[0] > 1 else vals[0]
 
 #########################################
 #       High-dimensional PDE class      #
@@ -517,6 +611,12 @@ class PDE:
                 'b': b_sum,
                 'b_aux': b_sum_aux
             },
+            "rpow4d":{
+                'f': f_rpow4d_bilap,
+                'ex_sol': ex_sol_rpow4d,
+                'b': b_rpow4d,
+                'b_aux': b_rpow4d_aux
+            }
         }
 
     def __init__(self, pcfg: dict, kcfg: dict):
@@ -623,8 +723,17 @@ class PDE:
         builder = self.KERNEL_REGISTRY[ktype]
         return builder(kcfg, self)
 
-    def _build_exact_sol_rhs(self, ex_sol_key):
-        if ex_sol_key in self.EXACT_SOL_REGISTRY:
+    def _build_exact_sol_rhs(self, ex_sol_key, pcfg=None):
+        if ex_sol_key == 'rpow4d':
+            if pcfg is not None:
+                q = float(pcfg.get('q', 0.6))
+            else:
+                q = 0.6
+            self.f = partial(f_rpow4d_bilap, q=q)
+            self.ex_sol = partial(ex_sol_rpow4d, q=q)
+            self.b = partial(b_rpow4d, q=q)
+            self.b_aux = partial(b_rpow4d_aux, q=q)
+        elif ex_sol_key in self.EXACT_SOL_REGISTRY:
             self.f = self.EXACT_SOL_REGISTRY[ex_sol_key]['f']
             self.ex_sol = self.EXACT_SOL_REGISTRY[ex_sol_key]['ex_sol']
             self.b = self.EXACT_SOL_REGISTRY[ex_sol_key]['b']
