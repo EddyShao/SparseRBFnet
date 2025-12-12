@@ -9,6 +9,7 @@ from pde.BiLapHighDim import PDE as BiLapHighDim
 from pde.ACSteadyState import PDE as ACSteadyState
 from pde.Eikonal import PDE as EikonalPDE  # add if/when needed
 from pde.EikonalAniso import PDE as EikonalAnisoPDE  # add if/when needed
+from pde.EikonalAnisoAniso import PDE as EikonalAnisoAnisoPDE  # add if/when needed
 # from pde.OtherPDE import PDE as OtherPDE  # add if/when needed
 
 
@@ -20,6 +21,7 @@ PDE_CLASS_REGISTRY: Dict[str, Type] = {
     "ACSteadyState": ACSteadyState,
     "Eikonal": EikonalPDE,
     "EikonalAniso": EikonalAnisoPDE,
+    "EikonalAnisoAniso": EikonalAnisoAnisoPDE,
 }
 
 

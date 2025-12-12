@@ -1,6 +1,6 @@
 pde:
   name: "EikonalAniso"
-  cls: "EikonalAniso"
+  cls: "EikonalAnisoAniso"
   rhs_type: "ones"
   Nobs_int: 784
   Nobs_bnd: 116
@@ -15,7 +15,7 @@ pde:
 
 kernel:
   type: "gaussian"
-  anisotropic: false
+  anisotropic: true
   sigma_min: 0.001
   sigma_max: 1.0
 

@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from src.kernel.Kernels import GaussianKernel, WendlandKernel, MaternKernel
+from src.kernel.Kernels import GaussianKernel2DAnisotropic as GaussianKernel
 from src.utils import Objective, sample_cube_obs, plot_solution_2d
 
 
@@ -223,28 +223,34 @@ class PDE:
         self.kernel = self._build_kernel(kcfg)
         self.init_pad_size = pcfg.get('init_pad_size', 16)
          
-        if kcfg.get('anisotropic', False):
-            self.dim = 2 * self.d # weight dimension
-        else:
-            self.dim = self.d + 1
+        if not kcfg.get('anisotropic', False):
+            raise ValueError("EikonalAnisoAniso.py requires 'anisotropic' = True in kernel config.")
 
 
-        # self.Omega = jnp.array([
-        #     [-2.0, 2.0],
-        #     [-2.0, 2.0],
-        #     [-10.0, 0.0],
-        # ])
-        self.Omega = jnp.vstack([jnp.array([-2.0, 2.0]) for _ in range(self.d)] + [jnp.array([-10.0, 0.0])])
+        self.anisotropic = True
+        self.dim = 5  # 2 spatial + 3 anisotropic parameters
+
+        # parameter domain Ω for (x0, x1, theta, r1, r2)
+        self.Omega = jnp.array([
+            [-2.0,  2.0],   # x0
+            [-2.0,  2.0],   # x1
+            [-10.0, 10.0],  # theta
+            [-7.0,  3.0],   # r1
+            [-7.0,  3.0],   # r2
+        ])
+
+        # initial padded state (x, s, u)
+        self.init_pad_size = int(pcfg.get("init_pad_size", 60))
+        self.u_zero = {
+            "x": jnp.zeros((self.init_pad_size, self.d)),      # centers
+            "s": jnp.zeros((self.init_pad_size, 3)),           # [theta, r1, r2]
+            "u": jnp.zeros((self.init_pad_size,)),             # outer weights
+        }
         
-        if kcfg.get('anisotropic', False):
-            self.Omega = jnp.vstack([self.Omega[:self.d, :], jnp.tile(self.Omega[self.d, :], (self.d, 1))])
+        
 
         assert self.dim == self.Omega.shape[0] 
 
-
-        self.u_zero = {"x": jnp.zeros((self.init_pad_size, self.d)), 
-                       "s": jnp.zeros((self.init_pad_size, self.dim-self.d)),  
-                       "u": jnp.zeros((self.init_pad_size))} 
         # Observation set
         self.Nobs_int = pcfg.get('Nobs_int', 28 ** 2)
         self.Nobs_bnd = pcfg.get('Nobs_bnd', 30 ** 2 - self.Nobs_int) 
@@ -314,10 +320,89 @@ class PDE:
         return randomx, randoms
 
     def plot_forward(self, x, s, c, suppc=None):
-        if self.d == 2:
-            plot_solution_2d(self, x, s, c, suppc=suppc)
+        """
+        Plots the forward solution.
+        """
+        if suppc is None:
+            suppc = np.ones_like(c, dtype=bool)
+        # assert self.dim == 3 
+
+        # # Extract the domain range
+        # pO = self.Omega[:-1, :]
+        plt.close('all')  # Close previous figure to prevent multiple windows
+
+        # Create a new figure
+        fig = plt.figure(figsize=(15, 5))
+        ax1 = fig.add_subplot(131, projection='3d')
+        ax2 = fig.add_subplot(132, projection='3d')
+        ax3 = fig.add_subplot(133)
+
+        t_x = np.linspace(self.D[0, 0], self.D[0, 1], 100)
+        t_y = np.linspace(self.D[1, 0], self.D[1, 1], 100)
+        X, Y = np.meshgrid(t_x, t_y)
+        t = np.vstack((X.flatten(), Y.flatten())).T
+
+        if self.ex_sol is not None:
+            f1 = self.ex_sol(t).reshape(X.shape)
+        # Plot exact solution
+        surf1 = ax1.plot_surface(X, Y, f1, cmap='viridis', edgecolor='none')
+        ax1.set_title("Exact Solution")
+        ax1.set_xlabel("X-axis")
+        ax1.set_ylabel("Y-axis")
+        fig.colorbar(surf1, ax=ax1, shrink=0.5, aspect=5)
+
+        # Compute predicted solution
+        Gu = self.kernel.kappa_X_c_Xhat(x, s, c, t)
+        # sigma is sigmoid of S
+
+        # Plot predicted solution
+        surf2 = ax2.plot_surface(X, Y, Gu.reshape(X.shape), cmap='viridis', edgecolor='none')
+        ax2.set_title("Predicted Solution") 
+        ax2.set_xlabel("X-axis")
+        ax2.set_ylabel("Y-axis")
+        ax2.set_zlabel("$f_2(x, y)$")
+        fig.colorbar(surf2, ax=ax2, shrink=0.5, aspect=5)
+
+
+        # plot all collocation point X
+        # together with error countour plot
+        contour = ax3.contourf(X, Y, np.abs(Gu.reshape(100, 100) - f1), cmap='viridis')        
+        # ax3.scatter(x[:, 0].flatten(), x[:, 1].flatten(), color='r', marker='x')
+        if self.anisotropic:
+            # Get per-center R (shape: (N, 2, 2)); convert to numpy for matplotlib
+            
+            for i, (xi, yi) in enumerate(x[:, :2]):
+                if suppc is not None and not bool(suppc[i]):
+                    continue
+                # Extract the i-th R matrix
+                s_i = s[i]
+                r1 = self.kernel.r_min[0] + (self.kernel.r_max[0] - self.kernel.r_min[0]) * jax.nn.sigmoid(s_i[1])
+                r2 = self.kernel.r_min[1] + (self.kernel.r_max[1] - self.kernel.r_min[1]) * jax.nn.sigmoid(s_i[2])
+                a1, a2 = 1.0 / r1, 1.0 / r2  # Semi-major and semi-minor axes lengths
+
+                # Rotation angle in degrees from x-axis
+                angle_deg = -np.degrees(jax.nn.sigmoid(s_i[0]))  # Map to [0, 90]
+
+                # Draw ellipse and center
+                ell = patches.Ellipse((xi, yi),
+                                    width=2*a1, height=2*a2, angle=angle_deg,
+                                    edgecolor='r', facecolor='none',
+                                    linestyle='dashed', linewidth=1, label="Reference ellipse")
+                ax3.add_patch(ell)
+                ax3.scatter(xi, yi, color='r', marker='x')
         else:
-            pass
+            raise NotImplementedError("only handles anisotropic case")
+
+        ax3.set_aspect('equal')  # Ensures circles are properly shaped
+        # # set colorbars
+        ax3.set_xlim(self.Omega[0, 0], self.Omega[0, 1])
+        ax3.set_ylim(self.Omega[1, 0], self.Omega[1, 1])
+        ax3.set_title("Collocation Points, Error Contour") 
+        fig.colorbar(contour, ax=ax3, shrink=0.5, aspect=5)   
+
+        plt.show(block=False)
+        plt.pause(1.0)  
+        
 
 
 
