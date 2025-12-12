@@ -1,0 +1,46 @@
+pde:
+  name: "EikonalAniso"
+  cls: "EikonalAniso"
+  rhs_type: "ones"
+  Nobs_int: 784
+  Nobs_bnd: 116
+  d: 2
+  sampling: "grid"
+  power: 4.01
+  epsilon: 0.001
+  scale: 0
+  init_pad_size: 64
+  add_noise: false
+  Ntest: 200
+
+kernel:
+  type: "gaussian"
+  anisotropic: false
+  sigma_min: 0.001
+  sigma_max: 1.0
+
+solver:
+  # global defaults shared across phases (unless overridden)
+  fp64: true
+  alpha: 1.0e-6
+  T: 5e-5
+  gamma: 0.0
+  Ntrial: 10000
+  blocksize: -1
+  print_every: 100
+  plot_every: 100
+  mask: true
+
+  phases:
+
+    - name: "full_second"
+      solver_name: "full"          # maps to src.solver.solve
+      max_step: 1000
+      TOL: 1.0e-6
+      plot_final: true
+
+  homotopy:
+    enabled: false
+    num_levels: 3
+    alpha_factor: 0.1              # alpha <- alpha * 0.1 after each level
+    T_factor: 10.0                 # T <- T * 10 after each level
