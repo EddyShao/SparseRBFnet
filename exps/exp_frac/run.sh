@@ -1,0 +1,1 @@
+ python scripts/solve_pde.py --config exps/exp_frac/base.yaml --seed 200 --save_dir exps/exp_frac/base_results/
