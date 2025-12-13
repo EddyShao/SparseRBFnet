@@ -63,7 +63,7 @@ class fracGaussianKernel(GaussianKernel):
         def Lap_kappa_single(x, s):
             sigma = self.sigma(s)[0]
             eps = 1 / (2 * sigma**2)
-            r = jnp.linalg.norm(x - xhat)**2
+            r = jnp.linalg.norm(x - xhat)
             scaled_r = r * jnp.sqrt(eps)
             
             coef = (sigma ** self.power) / (
@@ -201,7 +201,7 @@ class PDE:
     EXACT_SOL_REGISTRY = {
         "one": {
             "f": rhs,
-            "ex_sol": lambda x, frac_order=1., d=3: ex_sol(x, frac_order, d),
+            "ex_sol": lambda x, frac_order=1., d=1: ex_sol(x, frac_order, d),
         },
     }
     
@@ -278,6 +278,7 @@ class PDE:
 
         self.xhat_int, self.xhat_bnd = self.sample_obs(self.Nobs, method=self.method)
         self.xhat = jnp.vstack([self.xhat_int, self.xhat_bnd])
+        print(self.xhat_int)
         self.Nx_int = self.xhat_int.shape[0]
         self.Nx_bnd = self.xhat_bnd.shape[0]
         self.Nx = self.Nx_int + self.Nx_bnd
@@ -286,7 +287,6 @@ class PDE:
 
         self.Ntest = 200
         self.test_int, self.test_bnd = self.sample_obs(self.Ntest, method='grid')
-
         self.rhs_type = pcfg.get('rhs_type', 'one')
         self._build_exact_sol_rhs(self.rhs_type)
 
@@ -334,7 +334,7 @@ class PDE:
         # 1) Build coordinate vectors; drop one endpoint for angles (axes >= 1)
         coords_list = []
         for ax in range(self.d):
-            a, b = self.D[ax, 0], self.D[ax, 1]
+            a, b = 2 * self.D[ax, 0], 2 * self.D[ax, 1]
             endpoint = (ax == 0)  # r includes endpoint; angles do NOT
             coords = jnp.linspace(a, b, Nobs, endpoint=endpoint)
             coords_list.append(coords)
@@ -345,7 +345,7 @@ class PDE:
 
         # 3) Split by r < 1 vs r >= 1 (in parameter space)
         r = mesh[:, 0]
-        mask_int = r < 1.0
+        mask_int = jnp.abs(r) < 1.0
         mesh_int = mesh[mask_int]
         mesh_bnd = mesh[~mask_int]
 
@@ -393,7 +393,37 @@ class PDE:
         """
         Plots the forward solution.
         """
-        pass
+        # assert self.dim == 3 
+
+        # # Extract the domain range
+        # pO = self.Omega[:-1, :]
+        plt.close('all')  # Close previous figure to prevent multiple windows
+
+        # Create a new figure
+        fig = plt.figure(figsize=(8, 5))
+        ax1 = fig.add_subplot(111)
+        t_x = np.linspace(self.Omega[0, 0]-1, self.Omega[0, 1]+1, 200)
+        # extend this to d-dimensions, by adding d - 1 zeros
+        t = np.zeros((200, self.d))
+        t[:, 0] = t_x
+
+        f1 = self.ex_sol(t)
+        # Plot exact solution
+
+        ax1.plot(t_x, f1, label="Exact Solution")
+    
+        # Compute predicted solution
+        Gu = self.kernel.kappa_X_c_Xhat(x, s, c, t)
+        # sigma is sigmoid of S
+        ax1.plot(t_x, Gu, label="Predicted Solution")
+        sigma = self.kernel.sigma(s).flatten()
+        for i in range(x.shape[0]):
+            if suppc[i]:
+                y_i = self.kernel.kappa_X_c_Xhat(x, s, c, x[i:i+1, :])
+                plt.scatter(x[i], y_i, color='red', s=sigma[i]*300, marker='x')
+        plt.legend()    
+        plt.show(block=False)
+        plt.pause(1.0)  
 
 
 
