@@ -2,20 +2,43 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from src.Kernels import GaussianKernel
+from src.kernel.Kernels import GaussianKernel
 from src.utils import Objective, sample_cube_obs
 # from src.fracLapRBF import FractionalLaplacianRBF
-from src.build_interp import make_interp1d_with_custom_deriv
+from src.frac.build_interp import make_interp1d_with_custom_deriv
 import jax
 import jax.numpy as jnp
 from functools import partial
 from jax.scipy.special import gamma
-from scipy.special import hyp2f1
-jax.config.update("jax_enable_x64", True)
+from scipy.special import hyp2f1, gammaln
 
 # disable jit for debugging
 # jax.config.update("jax_disable_jit", True)
-data = jnp.load("/Users/zs/Desktop/SparseKernelPDE/fracLapRBF_example_output.npz")
+
+def _polar_to_euclid(mesh):
+    """mesh: (M, 2) with columns [r, theta]"""
+    r = mesh[:, 0]
+    th = mesh[:, 1]
+    x = r * jnp.cos(th)
+    y = r * jnp.sin(th)
+    return jnp.stack([x, y], axis=1)
+
+def _spherical_to_euclid(mesh):
+    """
+    mesh: (M, 3) with columns [r, phi, theta]
+      phi   = azimuth in x-y plane  (e.g. [-pi, pi) )
+      theta = polar/colatitude from +z (e.g. [0, pi) )
+    """
+    r = mesh[:, 0]
+    phi = mesh[:, 1]
+    th = mesh[:, 2]
+    x = r * jnp.sin(th) * jnp.cos(phi)
+    y = r * jnp.sin(th) * jnp.sin(phi)
+    z = r * jnp.cos(th)
+    return jnp.stack([x, y, z], axis=1)
+
+
+data = jnp.load("fracLapRBF_d_1_frac_order_1_gaussian.npz")
 r = data['r']
 y_grid = data['y']
 dy_grid = data['dy']
@@ -34,7 +57,6 @@ class fracGaussianKernel(GaussianKernel):
         self.linear_B = (self.kappa_X_c_Xhat,)
         self.DE = () 
         self.DB = ()  
-
     
     @partial(jax.jit, static_argnums=(0,))
     def Lap_kappa_X_c(self, X, S, c, xhat):
@@ -67,7 +89,6 @@ class fracGaussianKernel(GaussianKernel):
     def B_kappa_X_c(self, X, S, c, xhat):
         return self.kappa_X_c(X, S, c, xhat)
     
-
     def E_kappa_X_c_Xhat(self, *linear_results):
         return linear_results[0] 
 
@@ -94,10 +115,75 @@ class fracGaussianKernel(GaussianKernel):
     def DB_kappa(self, x, s, xhat, *args):
         return self.kappa(x, s, xhat)
 
-    
+def ex_sol(x, frac_order=1., d=3):
+    """
+    Exact solution for the restricted/integral fractional Laplacian on the unit ball:
+
+        u(x) = C_{d,alpha} * (1 - ||x||^2)_+^{alpha/2}
+
+    Parameters
+    ----------
+    x : array_like, shape (d,) or (N,d)
+        Spatial points
+    frac_order : float
+        alpha in (0,2]
+    d : int
+        Spatial dimension
+
+    Returns
+    -------
+    u : array
+        Values of u at x
+    """
+    alpha = float(frac_order)
+    d = int(d)
+
+    x = jnp.asarray(x)
+    x = jnp.atleast_2d(x)            # (N,d)
+
+    r2 = jnp.sum(x * x, axis=1)
+    inside = 1.0 - r2
+
+    # C_{d,alpha} = 2^{-alpha} * Gamma(d/2)
+    #               / (Gamma((d+alpha)/2) * Gamma(1+alpha/2))
+    logC = (-alpha * jnp.log(2.0)
+            + gammaln(0.5 * d)
+            - gammaln(0.5 * (d + alpha))
+            - gammaln(1.0 + 0.5 * alpha))
+    C = jnp.exp(logC)
+
+    u = C * jnp.where(inside > 0.0, inside ** (0.5 * alpha), 0.0)
+
+    return u if x.shape[0] > 1 else u[0]
+
+def rhs(x):
+    """
+    RHS for the unit-ball fractional Laplacian test:
+        (-Δ)^{α/2} u = 1   in |x|<1
+        u = 0              outside
+
+    Parameters
+    ----------
+    x : array_like, shape (d,) or (N,d)
+    frac_order : float
+        (unused here, included for interface consistency)
+    d : int
+        (unused here, included for interface consistency)
+
+    Returns
+    -------
+    f : array
+        RHS values
+    """
+    x = jnp.asarray(x)
+    x = jnp.atleast_2d(x)
+
+    r2 = jnp.sum(x * x, axis=1)
+    f = jnp.where(r2 < 1.0, 1.0, 0.0)
+
+    return f if x.shape[0] > 1 else f[0]
+
 class PDE:
-
-
 
     KERNEL_REGISTRY = {
         "fracGaussian": lambda p, kcfg: fracGaussianKernel(
@@ -112,6 +198,15 @@ class PDE:
     }
 
     
+    EXACT_SOL_REGISTRY = {
+        "one": {
+            "f": rhs,
+            "ex_sol": lambda x, frac_order=1., d=3: ex_sol(x, frac_order, d),
+        },
+    }
+    
+
+    
     def __init__(self, pcfg: dict, kcfg: dict):
         """
         Initializes the problem setup for a neural network-based Laplacian solver.
@@ -119,7 +214,8 @@ class PDE:
         # Problem parameters
         self.name = 'fracPoisson'
         self.d = int(pcfg.get("d", 4))
-        self.power = float(pcfg.get("power", self.d + 2.01))
+        self.frac_order = pcfg.get('frac_order', 1.0)
+        self.power = float(pcfg.get("power", self.d + self.frac_order + 0.01))
         self.scale = float(pcfg.get("scale", 1.0))
 
         self.seed = int(pcfg.get("seed", 200))
@@ -127,15 +223,28 @@ class PDE:
 
 
         # domain for the input weights
-        self.D = jnp.stack([
-                        jnp.array([-1., 1.])
-                        for _ in range(self.d)
-                    ])
 
-        self.vol_D = jnp.prod(self.D[:, 1] - self.D[:, 0])
+        if self.d == 1:
+            self.D = jnp.array([[-1.0, 1.0]])
+            self.vol_D = 2.0
+        elif self.d == 2:
+            self.D = jnp.array([[0, 1.0],
+                                [-jnp.pi, jnp.pi]])
+            self.vol_D = jnp.pi
+        elif self.d == 3:
+            self.D = jnp.array([[0, 1.0],
+                                [-jnp.pi, jnp.pi],
+                                [0, jnp.pi]])
+            self.vol_D = 4 * jnp.pi / 3
+
+        else:
+            raise NotImplementedError("Domain D not implemented for d > 3")
+
+        self.CompBox = jnp.vstack([jnp.array([-1., 1.]) for _ in range(self.d)])  # computational box
+        
 
         self.anisotropic = kcfg.get('anisotropic', False)
-        self.frac_order = pcfg.get('frac_order', 1.0)
+        
         print('Fractional order:', self.frac_order)
 
         self.kernel = self._build_kernel(kcfg)
@@ -146,10 +255,11 @@ class PDE:
             self.dim = self.d + 1
 
 
-        # x in [-2, 2]^d
-        Omega_x = jnp.tile(jnp.array([[-2.0, 2.0]]), (self.d, 1))
-        # s scalar in [-10, 0]
-        Omega_s = jnp.array([[-10.0, 0.0]])
+        # copy jnp.D to self.Omega
+         # Domain for sampling input weights
+        Omega_x = self.D
+        Omega_x = Omega_x.at[0, :].set(2.0 * Omega_x[0, :])
+        Omega_s = jnp.array([[-10, 0.0]])
         self.Omega = jnp.vstack([Omega_x, Omega_s])
         
         if self.anisotropic:
@@ -173,9 +283,12 @@ class PDE:
         self.Nx = self.Nx_int + self.Nx_bnd
         # Optimization-related attributes
         self.obj = Objective(self.Nx_int, self.Nx_bnd, scale=self.scale)
-        self.Ntest = 200
 
+        self.Ntest = 200
         self.test_int, self.test_bnd = self.sample_obs(self.Ntest, method='grid')
+
+        self.rhs_type = pcfg.get('rhs_type', 'one')
+        self._build_exact_sol_rhs(self.rhs_type)
 
     def _build_kernel(self, kcfg: dict):
         ktype = kcfg.get("type", "gaussian")
@@ -185,93 +298,72 @@ class PDE:
                 f"Available: {list(self.KERNEL_REGISTRY.keys())}"
             )
         builder = self.KERNEL_REGISTRY[ktype]
-        return builder(kcfg, self)
+        return builder(self, kcfg)
     
+    def _build_exact_sol_rhs(self, ex_sol_key):
+        if ex_sol_key in self.EXACT_SOL_REGISTRY:
+            self.f = self.EXACT_SOL_REGISTRY[ex_sol_key]['f']
+            self.ex_sol = lambda x: self.EXACT_SOL_REGISTRY[ex_sol_key]['ex_sol'](x, self.frac_order, self.d)
+        else:
+            raise ValueError(f"Unknown exact_solution key '{ex_sol_key}'. Available: {list(self.EXACT_SOL_REGISTRY.keys())}")
+
     # NEED TO MODIFY BELOW FOR SPHERICAL CASE
 
     def sample_test_obs(self, Ntest):
         """
         Sample test interior and boundary/exterior points using a grid method.
         """
-        return sample_cube_obs(Ntest, method="grid")
+        # actually we should do quadrature in a 
+        Ntest_int, Ntest_bnd = int((Ntest-2)**self.d), int((Ntest**self.d) - (Ntest-2)**self.d)
+        test_int, test_bnd = sample_cube_obs(self.CompBox, Ntest_int, Ntest_bnd, method="grid")
+        mask_int = jnp.norm(test_int, axis=1) <= 1.0
+        mask_bnd = jnp.norm(test_int, axis=1) > 1.0
+        return test_int[mask_int], test_int[mask_bnd]
     
 
     # NEED TO MODIFY BELOW FOR SPHERICAL CASE
     
     def sample_obs(self, Nobs, method="grid"):
         """
-        Sample interior and boundary/exterior points.
-
-        - if method == "frac_grid": build a full grid on [-2,2]^d,
-        then classify points inside [-1,1]^d vs outside.
-        - otherwise: fall back to the standard cube sampling.
+        Grid sample in (r, angles) on self.D, map to Euclidean, then split by r<1.
+        Angle axes (ax >= 1) use endpoint=False to avoid duplicating the seam.
         """
-        if method == 'frac_grid':
-            # --------- new fractional collocation: full grid on [-2,2]^d ---------
-            Ngrid_per_dim = int(jnp.asarray(
-                jnp.array(Nobs)
-            ))  # or pass pcfg into PDE, or store beforehand
+        if method != "grid":
+            raise NotImplementedError("Only method='grid' is implemented here.")
 
-            # 1D grid in [-2,2]
-            grid_1d = jnp.linspace(-2.0, 2.0, Ngrid_per_dim)  # (Ngrid_per_dim,)
+        # 1) Build coordinate vectors; drop one endpoint for angles (axes >= 1)
+        coords_list = []
+        for ax in range(self.d):
+            a, b = self.D[ax, 0], self.D[ax, 1]
+            endpoint = (ax == 0)  # r includes endpoint; angles do NOT
+            coords = jnp.linspace(a, b, Nobs, endpoint=endpoint)
+            coords_list.append(coords)
 
-            # Cartesian product -> shape (Ngrid_per_dim^d, d)
-            meshes = jnp.meshgrid(*[grid_1d] * self.d, indexing="ij")
-            grid = jnp.stack(meshes, axis=-1).reshape(-1, self.d)
+        # 2) Full tensor grid -> (M, d)
+        grids = jnp.meshgrid(*coords_list, indexing="ij")
+        mesh = jnp.stack([g.reshape(-1) for g in grids], axis=1)  # (M, d)
 
-            # interior mask: all coords in [-1,1]
-            interior_mask = jnp.logical_and(
-                jnp.all(grid >= -1.0, axis=1),
-                jnp.all(grid <=  1.0, axis=1),
-            )
+        # 3) Split by r < 1 vs r >= 1 (in parameter space)
+        r = mesh[:, 0]
+        mask_int = r < 1.0
+        mesh_int = mesh[mask_int]
+        mesh_bnd = mesh[~mask_int]
 
-            obs_int = grid[interior_mask]       # points inside physical domain
-            obs_bnd = grid[~interior_mask]      # "exterior" points
+        # 4) Map to Euclidean
+        if self.d == 1:
+            # If d==1, "r" is just x already (no angle)
+            obs_int = mesh_int[:, :1]
+            obs_bnd = mesh_bnd[:, :1]
+        elif self.d == 2:
+            obs_int = _polar_to_euclid(mesh_int)
+            obs_bnd = _polar_to_euclid(mesh_bnd)
+        elif self.d == 3:
+            obs_int = _spherical_to_euclid(mesh_int)
+            obs_bnd = _spherical_to_euclid(mesh_bnd)
+        else:
+            raise ValueError(f"Unsupported d={self.d} for polar/spherical mapping.")
 
-            # If you *really* want to enforce Nobs_int / Nobs_bnd,
-            # you can slice here (e.g. obs_int[:Nobs_int], etc.)
-            return obs_int, obs_bnd
-        
-        elif method == "bnd_emphasis":
-            # --------- continuous double-Gaussian boundary emphasis ---------
-            Ngrid_1d = int(Nobs)
-            bnd_sigma = float(self.pcfg.get("bnd_sigma", 0.15))   # width of peaks
-            w     = float(self.pcfg.get("bnd_weight", 0.45))  # peak weight
-            
-            # 1D reference mesh
-            x_ref = jnp.linspace(-2.0, 2.0, 20001)
-            
-            # double-Gaussian PDF
-            def pdf(x):
-                ga1 = jnp.exp(-((x + 1.0)**2) / (2*bnd_sigma**2))
-                ga2 = jnp.exp(-((x - 1.0)**2) / (2*bnd_sigma**2))
-                p = w * ga1 + w * ga2 + (1 - 2*w) * 1.0      # uniform background
-                return p
-            
-            p_ref = pdf(x_ref)
-            p_ref = p_ref / jnp.trapz(p_ref, x_ref)         # normalize
-            
-            cdf_ref = jnp.cumsum(p_ref)
-            cdf_ref = cdf_ref / cdf_ref[-1]
-            
-            # invert CDF on uniform grid
-            u = jnp.linspace(0.0, 1.0, Ngrid_1d)
-            grid_1d = jnp.interp(u, cdf_ref, x_ref)
-            
-            # Cartesian grid in d dimensions
-            meshes = jnp.meshgrid(*[grid_1d]*self.d, indexing="ij")
-            grid   = jnp.stack(meshes, axis=-1).reshape(-1, self.d)
-            
-            # classify points
-            interior_mask = jnp.logical_and(
-                jnp.all(grid >= -1.0, axis=1),
-                jnp.all(grid <=  1.0, axis=1),
-            )
-            
-            obs_int = grid[interior_mask]
-            obs_bnd = grid[~interior_mask]
-            
-            return obs_int, obs_bnd
+        return obs_int, obs_bnd
 
 # NEED TO MODIFY BELOW FOR SPHERICAL CASE
     def sample_param(self, Ntarget):
@@ -280,12 +372,20 @@ class PDE:
         """
 
         self.key, subkey1, subkey2 = jax.random.split(self.key, 3)
-        randomx = self.Omega[0, 0] + (self.Omega[:self.d, 1] - self.Omega[:self.d, 0]) * jax.random.uniform(
+        randomp = self.Omega[0, 0] + (self.Omega[:self.d, 1] - self.Omega[:self.d, 0]) * jax.random.uniform(
             subkey1, shape=(Ntarget, self.d)
         )
         randoms = self.Omega[-1, 0] + (self.Omega[self.d:, 1] - self.Omega[self.d:, 0]) * jnp.tile(
             jax.random.uniform(subkey2, shape=(Ntarget, 1)), (1, self.dim - self.d)
         )
+        if self.d == 1:
+            randomx = randomp
+        elif self.d == 2:
+            randomx = _polar_to_euclid(randomp)
+        elif self.d == 3:
+            randomx = _spherical_to_euclid(randomp)
+        else:
+            raise ValueError(f"Unsupported d={self.d} for polar/spherical mapping.")
 
         return randomx, randoms
 
@@ -293,37 +393,7 @@ class PDE:
         """
         Plots the forward solution.
         """
-        # assert self.dim == 3 
-
-        # # Extract the domain range
-        # pO = self.Omega[:-1, :]
-        plt.close('all')  # Close previous figure to prevent multiple windows
-
-        # Create a new figure
-        fig = plt.figure(figsize=(8, 5))
-        ax1 = fig.add_subplot(111)
-        t_x = np.linspace(self.Omega[0, 0]-1, self.Omega[0, 1]+1, 200)
-        # extend this to d-dimensions, by adding d - 1 zeros
-        t = np.zeros((200, self.d))
-        t[:, 0] = t_x
-
-        f1 = self.ex_sol(t)
-        # Plot exact solution
-
-        ax1.plot(t_x, f1, label="Exact Solution")
-    
-        # Compute predicted solution
-        Gu = self.kernel.kappa_X_c_Xhat(x, s, c, t)
-        # sigma is sigmoid of S
-        ax1.plot(t_x, Gu, label="Predicted Solution")
-        sigma = self.kernel.sigma(s).flatten()
-        for i in range(x.shape[0]):
-            if suppc[i]:
-                y_i = self.kernel.kappa_X_c_Xhat(x, s, c, x[i:i+1, :])
-                plt.scatter(x[i], y_i, color='red', s=sigma[i]*300, marker='x')
-        plt.legend()    
-        plt.show(block=False)
-        plt.pause(1.0)  
+        pass
 
 
 
