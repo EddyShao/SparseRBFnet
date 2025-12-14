@@ -323,7 +323,7 @@ class GaussianKernel2DAnisotropic(_Kernel):
 
         # build rotational matrix with the first element being theta
         theta = s[..., 0]
-        theta = jax.nn.sigmoid(theta) * jnp.pi/2  # map to [0, pi/2]
+        theta = jax.nn.sigmoid(theta) * jnp.pi  # map to [0, pi/2]
         cos_theta = jnp.cos(theta)
         sin_theta = jnp.sin(theta)
         Q_theta = jnp.array([[cos_theta, -sin_theta], [sin_theta, cos_theta]])  # shape (..., 2, 2)
