@@ -60,7 +60,7 @@ class EikonalKernelMixin:
     
     @partial(jax.jit, static_argnums=(0,))
     def Lap_kappa_X_c(self, X, S, c, xhat):
-        return jnp.trace(self.L @ self.L.T @ jax.hessian(self.kappa_X_c, argnums=3)(X, S, c, xhat))
+        return jnp.trace(jax.hessian(self.kappa_X_c, argnums=3)(X, S, c, xhat))
     
     @partial(jax.jit, static_argnums=(0,))
     def Lap_kappa_X_c_Xhat(self, X, S, c, Xhat): 
@@ -90,7 +90,7 @@ class EikonalKernelMixin:
     def DE_kappa(self, x, s, xhat, *args):
         nabla_u = args[0]
         nabla_v = self.L.T @ jax.grad(self.kappa, argnums=2)(x, s, xhat)
-        lap_v = jnp.trace(self.L @ self.L.T @ jax.hessian(self.kappa, argnums=2)(x, s, xhat))
+        lap_v = jnp.trace(jax.hessian(self.kappa, argnums=2)(x, s, xhat))
         return 2*jnp.dot(nabla_u, nabla_v) - self.epsilon*lap_v
 
     @partial(jax.jit, static_argnums=(0,))
@@ -216,8 +216,8 @@ class PDE:
         self.vol_D = jnp.prod(self.D[:, 1] - self.D[:, 0])
 
         self.L = jnp.array([
-                [1,             0.       ],
-                [2,             3],
+                [2.6,             0.       ],
+                [-4.0,             1.8],
             ])
 
         self.kernel = self._build_kernel(kcfg)

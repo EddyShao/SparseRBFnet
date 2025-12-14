@@ -38,7 +38,7 @@ def _spherical_to_euclid(mesh):
     return jnp.stack([x, y, z], axis=1)
 
 
-data = jnp.load("fracLapRBF_d_1_frac_order_1_gaussian.npz")
+data = jnp.load("fracLapRBF_d_3_frac_order_1_gaussian.npz")
 r = data['r']
 y_grid = data['y']
 dy_grid = data['dy']
