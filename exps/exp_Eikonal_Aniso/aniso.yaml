@@ -2,14 +2,14 @@ pde:
   name: "EikonalAniso"
   cls: "EikonalAnisoAniso"
   rhs_type: "ones"
-  Nobs_int: 784
-  Nobs_bnd: 116
+  Nobs_int: 2304
+  Nobs_bnd: 196
   d: 2
   sampling: "grid"
   power: 4.01
-  epsilon: 0.05
+  epsilon: 0.01
   scale: 0
-  init_pad_size: 8
+  init_pad_size: 16
   add_noise: false
   Ntest: 200
 
@@ -23,7 +23,7 @@ solver:
   # global defaults shared across phases (unless overridden)
   fp64: true
   alpha: 1.0e-8
-  T: 5e-6
+  T: 5e-2
   gamma: 0.0
   Ntrial: 10000
   blocksize: -1
@@ -35,8 +35,8 @@ solver:
 
     - name: "full_second"
       solver_name: "full"          # maps to src.solver.solve
-      max_step: 3000
-      TOL: 1.0e-20
+      max_step: 1000
+      TOL: 1.0e-6
       plot_final: true
 
   homotopy:
