@@ -7,9 +7,9 @@ pde:
   d: 2
   sampling: "grid"
   power: 4.01
-  epsilon: 0.001
-  scale: 1000
-  init_pad_size: 64
+  epsilon: 0.05
+  scale: 0
+  init_pad_size: 8
   add_noise: false
   Ntest: 200
 
@@ -17,13 +17,13 @@ kernel:
   type: "gaussian"
   anisotropic: true
   sigma_min: 0.001
-  sigma_max: 1.0
+  sigma_max: 0.5
 
 solver:
   # global defaults shared across phases (unless overridden)
   fp64: true
-  alpha: 1.0e-6
-  T: 5e-5
+  alpha: 1.0e-8
+  T: 5e-6
   gamma: 0.0
   Ntrial: 10000
   blocksize: -1
@@ -35,8 +35,8 @@ solver:
 
     - name: "full_second"
       solver_name: "full"          # maps to src.solver.solve
-      max_step: 1000
-      TOL: 1.0e-6
+      max_step: 3000
+      TOL: 1.0e-20
       plot_final: true
 
   homotopy:

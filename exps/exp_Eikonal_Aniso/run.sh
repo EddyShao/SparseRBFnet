@@ -1,1 +1,2 @@
- python scripts/solve_pde.py --config exps/exp_Eikonal_Aniso/base_aniso.yaml --seed 200 --save_dir exps/exp_Eikonal_Aniso/ 
+python scripts/solve_pde.py --config exps/exp_Eikonal_Aniso/base_aniso.yaml --seed 202 --save_dir exps/exp_Eikonal_Aniso/
+# python scripts/solve_pde.py --config exps/exp_Eikonal_Aniso/base.yaml --seed 202 --save_dir exps/exp_Eikonal_Aniso/
