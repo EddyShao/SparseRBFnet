@@ -306,18 +306,35 @@ class PDE:
 
 
     def sample_param(self, Ntarget):
-        self.key, subkey1, subkey2 = jax.random.split(self.key, 3)
+        """
+        Sample Ntarget random parameters in Ω.
 
-        # centers x: (N,2)
-        lo_x = self.Omega[:self.d, 0]
-        hi_x = self.Omega[:self.d, 1]
-        randomx = lo_x + (hi_x - lo_x) * jax.random.uniform(subkey1, (Ntarget, self.d))
+        Returns:
+            randomx : (Ntarget, 2)     center locations
+            randoms : (Ntarget, 3)     [theta, r1, r2]
+        """
+        self.key, subkey1, subkey2, subkey3 = jax.random.split(self.key, 4)
 
-        # anisotropic params s = (theta, r1, r2): (N,3)
-        lo_s = self.Omega[self.d:, 0]
-        hi_s = self.Omega[self.d:, 1]
-        randoms = lo_s + (hi_s - lo_s) * jax.random.uniform(subkey2, (Ntarget, self.dim - self.d))
+        # x-centers
+        randomx = self.Omega[: self.d, 0] + (
+            self.Omega[: self.d, 1] - self.Omega[: self.d, 0]
+        ) * jax.random.uniform(subkey1, shape=(Ntarget, self.d))
 
+        # theta
+        random_theta = self.Omega[self.d, 0] + (
+            self.Omega[self.d, 1] - self.Omega[self.d, 0]
+        ) * jax.random.uniform(subkey2, shape=(Ntarget, 1))
+
+        # r1, r2 sampled with a shared u_r (as in your original code)
+        u_r = jax.random.uniform(subkey3, shape=(Ntarget, 1))
+        random_r1 = self.Omega[self.d + 1, 0] + (
+            self.Omega[self.d + 1, 1] - self.Omega[self.d + 1, 0]
+        ) * u_r
+        random_r2 = self.Omega[self.d + 2, 0] + (
+            self.Omega[self.d + 2, 1] - self.Omega[self.d + 2, 0]
+        ) * u_r
+
+        randoms = jnp.hstack([random_theta, random_r1, random_r2])  # (Ntarget, 3)
         return randomx, randoms
 
     def plot_forward(self, x, s, c, suppc=None):
