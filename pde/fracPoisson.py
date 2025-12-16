@@ -291,9 +291,11 @@ class PDE:
             raise NotImplementedError("Domain D not implemented for d > 3")
         
         self.w_r_sigma = pcfg.get('w_r_sigma', None)
+        self.w_r_mu = pcfg.get('w_r_mu', 1.0)
         if self.w_r_sigma is not None:
-            self.w_r = _build_gaussian_w_r(mu=self.D[0, 1], sigma=self.w_r_sigma)
-
+            self.w_r = _build_gaussian_w_r(mu=self.w_r_mu, sigma=self.w_r_sigma)
+        else:
+            self.w_r = None
         self.CompBox = jnp.vstack([jnp.array([-2., 2.]) for _ in range(self.d)])  # computational box
         
 
@@ -312,7 +314,7 @@ class PDE:
         # copy jnp.D to self.Omega
          # Domain for sampling input weights
 
-        self.annulus_factor = 1.2
+        self.annulus_factor = 2.0
         Omega_x = self.D
         Omega_x = Omega_x.at[0, :].set(self.annulus_factor * Omega_x[0, :])
         Omega_s = jnp.array([[-10, 0.0]])
@@ -379,7 +381,7 @@ class PDE:
 
     # NEED TO MODIFY BELOW FOR SPHERICAL CASE
     
-    def sample_obs(self, Nobs, method="grid", w_r=None):
+    def sample_obs(self, Nobs, method="grid"):
         """
         method:
         - "grid": your original uniform-in-r grid
@@ -394,9 +396,8 @@ class PDE:
         # ---- 1) coordinate vectors ----
         coords_list = []
         for ax in range(self.d):
-            a, b = 0.0, self.annulus_factor * self.D[ax, 1]
-
             if ax == 0:
+                a, b = 0.0, self.annulus_factor * self.D[ax, 1]
                 # r-axis
                 if method == "grid":
                     if self.d == 1: 
@@ -408,6 +409,7 @@ class PDE:
                         raise ValueError("For method='grid_weighted_r', you must pass w_r(r).")
                     coords = _build_weighted_r_grid(a, b, Nobs, self.w_r)
             else:
+                a, b = self.annulus_factor * self.D[ax, 0], self.D[ax, 1]
                 # angles unchanged (endpoint=False as you already do)
                 coords = jnp.linspace(a, b, Nobs, endpoint=False)
 
@@ -425,8 +427,8 @@ class PDE:
 
         # ---- 4) map to Euclidean (same as you) ----
         if self.d == 1:
-            obs_int = jnp.stack([mesh_int[:, :1], -mesh_int[:, :1]], axis=1)
-            obs_bnd = jnp.stack([mesh_bnd[:, :1], -mesh_bnd[:, :1]], axis=1)
+            obs_int = jnp.vstack([mesh_int[:, :1], -mesh_int[:, :1]])
+            obs_bnd = jnp.vstack([mesh_bnd[:, :1], -mesh_bnd[:, :1]])
         elif self.d == 2:
             obs_int = _polar_to_euclid(mesh_int)
             obs_bnd = _polar_to_euclid(mesh_bnd)
@@ -465,40 +467,70 @@ class PDE:
     def plot_forward(self, x, s, c, suppc):
 
         if self.d == 1:
-            """
-            Plots the forward solution.
-            """
-            # assert self.dim == 3 
+            plt.close('all')
 
-            # # Extract the domain range
-            # pO = self.Omega[:-1, :]
-            plt.close('all')  # Close previous figure to prevent multiple windows
+            # --- figure with two rows ---
+            fig, (ax1, ax2) = plt.subplots(
+                2, 1,
+                figsize=(8, 7),                    # taller figure
+                gridspec_kw={"height_ratios": [3, 1], "hspace": 0.3}
+            )
 
-            # Create a new figure
-            fig = plt.figure(figsize=(8, 5))
-            ax1 = fig.add_subplot(111)
-            t_x = np.linspace(self.Omega[0, 0]-1, self.Omega[0, 1]+1, 200)
-            # extend this to d-dimensions, by adding d - 1 zeros
-            t = np.zeros((200, self.d))
+            # =========================
+            # Top plot: solution
+            # =========================
+            t_x = np.linspace(self.Omega[0, 0] - 1, self.Omega[0, 1] + 1, 1000)
+
+            t = np.zeros((1000, self.d))
             t[:, 0] = t_x
 
+            # Exact solution
             f1 = self.ex_sol(t)
-            # Plot exact solution
-
             ax1.plot(t_x, f1, label="Exact Solution")
-        
-            # Compute predicted solution
+
+            # Predicted solution
             Gu = self.kernel.kappa_X_c_Xhat(x, s, c, t)
-            # sigma is sigmoid of S
             ax1.plot(t_x, Gu, label="Predicted Solution")
+
+            # Active kernel centers
             sigma = self.kernel.sigma(s).flatten()
             for i in range(x.shape[0]):
                 if suppc[i]:
                     y_i = self.kernel.kappa_X_c_Xhat(x, s, c, x[i:i+1, :])
-                    plt.scatter(x[i], y_i, color='red', s=sigma[i]*300, marker='x')
-            plt.legend()    
+                    ax1.scatter(
+                        x[i, 0], y_i,
+                        color="red",
+                        s=sigma[i] * 300,
+                        marker="x"
+                    )
+
+            ax1.set_ylabel("u(x)")
+            ax1.legend()
+            ax1.grid(True, alpha=0.3)
+
+            # =========================
+            # Bottom plot: histogram of x̂_int
+            # =========================
+            x_hat = np.asarray(self.xhat[:, 0])
+
+            ax2.hist(
+                x_hat,
+                bins=40,              # adjust as needed
+                density=True,         # show distribution, not counts
+                alpha=0.7,
+                edgecolor="black"
+            )
+
+            ax2.set_xlim(ax1.get_xlim())
+            ax2.set_xlabel("x")
+            ax2.set_ylabel("density")
+            ax2.set_title("Histogram of interior observation points $x_{\\mathrm{int}}$")
+
+            ax2.grid(True, alpha=0.3)
+
+            # =========================
             plt.show(block=False)
-            plt.pause(1.0)  
+            plt.pause(1.0)
         elif self.d == 2:
             plot_solution_2d(self, x, s, c, suppc)
         else:
