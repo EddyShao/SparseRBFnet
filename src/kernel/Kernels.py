@@ -341,7 +341,7 @@ class GaussianKernel2DAnisotropic(_Kernel):
             transformed = R @ (x - xhat)
             squared = jnp.sum(transformed ** 2)
             det_R = jnp.linalg.det(R)
-            C_R = det_R**(2 - self.power) /  (jnp.sqrt(2 * jnp.pi)  ** self.d)
+            C_R = det_R**(1 - self.power/2) /  (jnp.sqrt(2 * jnp.pi)  ** self.d)
             return C_R * jnp.exp(-squared / 2)
         else:
             raise ValueError("This piece handles the anisotropic case")

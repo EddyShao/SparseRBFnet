@@ -1,12 +1,35 @@
 import jax
 import jax.numpy as jnp
+import numpy as np
 from functools import partial
 jax.config.update("jax_enable_x64", True)
 # -------------------------- helpers: Bessel J_{±1/2} and derivatives --------------------------
 
+def make_J0_quadrature(n_theta=256, dtype=jnp.float64):
+    nodes, weights = np.polynomial.legendre.leggauss(n_theta)
+    theta = 0.5 * (nodes + 1.0) * np.pi
+    w = 0.5 * np.pi * weights
+
+    cth = jnp.asarray(np.cos(theta), dtype=dtype)  # precompute in numpy
+    w   = jnp.asarray(w, dtype=dtype)
+    inv_pi = jnp.asarray(1.0 / np.pi, dtype=dtype)
+
+    @jax.jit
+    def _jv_0(x):
+        x = jnp.asarray(x, dtype=dtype)
+        integrand = jnp.cos(x[..., None] * cth[None, :])
+        return inv_pi * jnp.sum(integrand * w, axis=-1)
+
+    return _jv_0
+
+_jv_0 = make_J0_quadrature(n_theta=2048, dtype=jnp.float64)
+
+
+
 def _jv_half(kappa, j):
     is_mhalf = jnp.isclose(kappa, -0.5)
     is_phalf = jnp.isclose(kappa,  0.5)
+    is_zero = jnp.isclose(kappa,  0.0)
 
     def cos_branch(x):
         x_safe = jnp.where(x == 0.0, 1.0, x)
@@ -19,14 +42,22 @@ def _jv_half(kappa, j):
         val = jnp.sqrt(2.0 / (x_safe * jnp.pi)) * jnp.sin(x_safe)
         # correct limit: J_{1/2}(0) = 0
         return jnp.where(x == 0.0, 0.0, val)
+    
+    def zero_branch(x):
+        return _jv_0(x)
 
     def unsupported(x): return jnp.nan * x
 
     return jax.lax.cond(
-        is_mhalf,
-        cos_branch,
-        lambda x_: jax.lax.cond(is_phalf, sin_branch, unsupported, x_),
-        j,
+        is_zero,
+        zero_branch,
+        lambda x_: jax.lax.cond(
+            is_mhalf,
+            cos_branch,
+            lambda x__: jax.lax.cond(is_phalf, sin_branch, unsupported, x__),
+            x_
+        ),
+        j
     )
 
 def _jv_half_prime(kappa, j):
@@ -160,7 +191,7 @@ class FractionalLaplacianRBF:
 
     def __init__(self, d, frac_order, kernel, kernel_params, *,
                  h=0.05, N=100, M=None):
-        if not d in (1, 3):
+        if not d in (1, 2, 3):
             raise NotImplementedError("Currently only d=1,2,3 are supported.")
         
         self.d = float(d)
@@ -169,6 +200,15 @@ class FractionalLaplacianRBF:
         self.kernel_params = dict(kernel_params)
         if M is None:
             M = jnp.pi / h
+        
+        if int(self.d) == 1:
+            self.Jk = lambda x: _jv_half(-0.5, x)   # closed form
+        elif int(self.d) == 2:
+            self.Jk = _jv_0                         # your quadrature J0
+        elif int(self.d) == 3:
+            self.Jk = lambda x: _jv_half(0.5, x)    # closed form
+        else:
+            raise NotImplementedError("Currently only d=1,2,3 are supported.")
 
         # quadrature precompute
         self.quad = _build_hankel_rule(self.d, self.alpha, h=h, N=N, M=jnp.array(M))
@@ -186,7 +226,11 @@ class FractionalLaplacianRBF:
 
         # build scalar evaluators
         self._f_scalar = self._make_scalar_eval()
-        self._df_scalar = self._make_scalar_deriv()
+        if int(self.d) in (1, 3):
+            self._df_scalar = self._make_scalar_deriv()
+        else:
+            self._df_scalar = None  # derivative not implemented for d=2, will use finite difference
+            
         self._attach_custom_jvp()
 
     # --------- core (scalar) formulas, reusing your implementations ----------
@@ -197,7 +241,7 @@ class FractionalLaplacianRBF:
 
         def body_for_rpos(rr):
             power = (0.5*d + alpha)
-            Jk = _jv_half(kappa, j)
+            Jk = self.Jk(j)
             Fvals = self.Fphi(j / rr)
             summand = (j**power) * Fvals * Jk * (wj / rr)
             return (h * rr**(-alpha + 1.0 - d)) * jnp.sum(summand)
@@ -246,6 +290,10 @@ class FractionalLaplacianRBF:
     # --------- optional: attach analytic JVP so grad(eval)=derivative ---------
 
     def _attach_custom_jvp(self):
+        if self._df_scalar is None:
+            self.eval = jax.jit(_wrap_scalar_or_batch(self._f_scalar))
+            self.derivative = None
+            return
         # Build a scalar function with custom_jvp attached and then vmap it.
         d_eval = self._df_scalar  # analytic derivative (scalar)
 

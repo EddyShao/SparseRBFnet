@@ -57,7 +57,9 @@ def make_interp1d_with_custom_deriv(xg, yg, dyg, *, fill_value=0.0):
 
 
 if __name__ == "__main__":
-    data = jnp.load("src/frac/fracLapRBF_example_output.npz")
+    import sys
+    sys.path.append("..")
+    data = jnp.load("fracLapRBF_d_2_frac_order_2_gaussian.npz")
     r = data['r']
     y_grid = data['y']
     dy_grid = data['dy']
@@ -70,30 +72,33 @@ if __name__ == "__main__":
     print(jax.grad(f)(xq))  # interpolated derivative
 
     # Evaluate on a grid
-    y_space = f(x_space)
+    y_grid = f(x_space)
     # dy_space = jax.grad(f)(x_space)
-    dy_space = jax.vmap(jax.grad(f))(x_space)
+    dy_grid = jax.vmap(jax.grad(f))(x_space)
 
     def analytic_fraclap_gaussian(r, d=1, eps=1.0):
         return -(4.0 * (eps**2) * (r**2) - 2.0 * d * eps) * jnp.exp(-eps * r**2)
+
+    def analytic_derivative(r, d=1, eps=1.0):
+        return jnp.exp(-eps * r**2) * (8.0 * (eps**2) * r**3 - (4.0 * d  + 8)* eps * r)
     
+    y_grid_analytic = analytic_fraclap_gaussian(x_space, d=2, eps=1.0)
+    dy_grid_analytic = analytic_derivative(x_space, d=2, eps=1.0)
+    # compute relative errors
+    rel_error_y = jnp.linalg.norm(y_grid - y_grid_analytic) / jnp.linalg.norm(y_grid_analytic)
+    rel_error_dy = jnp.linalg.norm(dy_grid - dy_grid_analytic) / jnp.linalg.norm(dy_grid_analytic)
+    print("Relative error in K:", rel_error_y)
+    print("Relative error in K derivative:", rel_error_dy)
 
-    
-
-    y_analytic = analytic_fraclap_gaussian(x_space)
-    dy_analytic = jax.vmap(jax.grad(lambda r: analytic_fraclap_gaussian(r)))(x_space)
-
-
-
-
+    # plot to verify
     import matplotlib.pyplot as plt
-    # plt.plot(x_space, y_space, label="y")
-    plt.plot(x_space, dy_space, label="dy/dx")
-    # plt.plot(x_space, y_analytic, '--', label="y analytic")
-    plt.plot(x_space, dy_analytic, '--', label="dy/dx analytic")
-
-    plt.legend()
-    plt.show()
-
+    plt.plot(x_space, y_grid, label='numerical K')
+    plt.plot(x_space, dy_grid, linestyle='dashed', label='numerical K derivative')
+    plt.plot(x_space, y_grid_analytic, linestyle='dotted', label='analytic K')
+    plt.plot(x_space, dy_grid_analytic, linestyle='dashdot', label='analytic K derivative')
+    plt.savefig("src/frac/interp_vs_analytic.png")
+    # plt.show(block=False)  # show non-blocking
+    # plt.show()        
+    
 
 

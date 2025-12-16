@@ -414,7 +414,7 @@ def solve(p, y_ref, alg_opts):
             print(f"\n#### PAD_SIZE decreased to {pad_size}, RECOMPILING: {recompile} ####\n")
 
             # update xhat_int and xhat_bnd, resampling
-        if alg_opts.get('sampling', 'uniform') != 'grid':
+        if 'grid' not in alg_opts.get('sampling', 'uniform'):
             p.xhat_int, p.xhat_bnd = p.sample_obs(p.Nobs_int, p.Nobs_bnd, method=alg_opts.get('sampling', 'uniform'))
             # recompute j due to resampling
             y_ref = p.f(p.xhat)

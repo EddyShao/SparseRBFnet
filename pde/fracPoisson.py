@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from src.kernel.Kernels import GaussianKernel
-from src.utils import Objective, sample_cube_obs
+from src.utils import Objective, sample_cube_obs, plot_solution_2d
 # from src.fracLapRBF import FractionalLaplacianRBF
 from src.frac.build_interp import make_interp1d_with_custom_deriv
 import jax
@@ -38,12 +38,53 @@ def _spherical_to_euclid(mesh):
     return jnp.stack([x, y, z], axis=1)
 
 
-data = jnp.load("fracLapRBF_d_3_frac_order_1_gaussian.npz")
-r = data['r']
-y_grid = data['y']
-dy_grid = data['dy']
 
-LapFrac = make_interp1d_with_custom_deriv(r, y_grid, dy_grid)
+@jax.custom_jvp
+def safe_norm(diff, eps=1e-12):
+    # value: exact Euclidean norm
+    return jnp.linalg.norm(diff)
+
+@safe_norm.defjvp
+def _safe_norm_jvp(primals, tangents):
+    diff, eps = primals
+    diff_dot, eps_dot = tangents  # eps_dot unused
+    r = jnp.linalg.norm(diff)
+    # unit = diff / r, but safe at r=0
+    inv_r = jnp.where(r > eps, 1.0 / r, 0.0)
+    unit = diff * inv_r
+    # dr = <unit, diff_dot>
+    r_dot = jnp.dot(unit, diff_dot)
+    return r, r_dot
+
+
+def _build_gaussian_w_r(mu=1.0, sigma=0.1):
+    def w_r(r):
+        return jnp.exp(-0.5 * ((r - mu) / sigma) ** 2)
+    return w_r
+
+def _build_weighted_r_grid(rmin, rmax, Nobs, w_r, *, Nc=4096, eps=1e-14):
+    """
+    Build a deterministic r-grid using inverse-CDF sampling of weight w_r(r).
+    - rmin, rmax: endpoints for r
+    - Nobs: number of r grid points (same as before)
+    - w_r: callable w_r(r) >= 0
+    - Nc: resolution used to build the CDF (bigger = better, still cheap)
+    """
+    r_fine = jnp.linspace(rmin, rmax, Nc)
+    w = w_r(r_fine)
+    w = jnp.where(jnp.isfinite(w) & (w > 0.0), w, 0.0)
+
+    # trapezoid CDF
+    dr = (rmax - rmin) / (Nc - 1)
+    cdf = jnp.cumsum(w) * dr
+    Z = cdf[-1]
+    cdf = jnp.where(Z > eps, cdf / Z, jnp.linspace(0.0, 1.0, Nc))
+
+    # target quantiles (use midpoints to avoid hitting endpoints too hard)
+    u = (jnp.arange(Nobs) + 0.5) / Nobs
+    # inverse CDF by interpolation
+    r_grid = jnp.interp(u, cdf, r_fine)
+    return r_grid
 
 class fracGaussianKernel(GaussianKernel):
     def __init__(self, d, power, sigma_max, sigma_min, frac_order=1.0, anisotropic=False, mask=False, D=None):
@@ -57,13 +98,21 @@ class fracGaussianKernel(GaussianKernel):
         self.linear_B = (self.kappa_X_c_Xhat,)
         self.DE = () 
         self.DB = ()  
+        fracLapfile = f"fracLapRBF_d_{d}_frac_order_{int(frac_order)}_gaussian.npz"
+        print("Loading fractional Laplacian RBF data from:", fracLapfile)
+        data = jnp.load(fracLapfile)
+        r = data['r']
+        y_grid = data['y']
+        dy_grid = data['dy']
+        self.LapFrac = make_interp1d_with_custom_deriv(r, y_grid, dy_grid)
     
     @partial(jax.jit, static_argnums=(0,))
     def Lap_kappa_X_c(self, X, S, c, xhat):
         def Lap_kappa_single(x, s):
             sigma = self.sigma(s)[0]
             eps = 1 / (2 * sigma**2)
-            r = jnp.linalg.norm(x - xhat)
+            # r = jnp.linalg.norm(x - xhat)
+            r = safe_norm(x - xhat)
             scaled_r = r * jnp.sqrt(eps)
             
             coef = (sigma ** self.power) / (
@@ -71,7 +120,7 @@ class fracGaussianKernel(GaussianKernel):
             )
             sigma_cor = eps ** (self.frac_order / 2)
 
-            return coef * sigma_cor * LapFrac(scaled_r)
+            return coef * sigma_cor * self.LapFrac(scaled_r)
         val = jax.vmap(Lap_kappa_single, in_axes=(0, 0))(X, S)
 
         return jnp.dot(val.flatten(), c)
@@ -99,7 +148,8 @@ class fracGaussianKernel(GaussianKernel):
     def DE_kappa(self, x, s, xhat, *args):
         sigma = self.sigma(s)[0]
         eps = 1 / (2 * sigma**2)
-        r = jnp.linalg.norm(x - xhat)
+        # r = jnp.linalg.norm(x - xhat)
+        r = safe_norm(x - xhat)
         scaled_r = r * jnp.sqrt(eps)
         
         coef = (sigma ** self.power) / (
@@ -107,7 +157,7 @@ class fracGaussianKernel(GaussianKernel):
         )
         sigma_cor = eps ** (self.frac_order / 2)
 
-        return coef * sigma_cor * LapFrac(scaled_r)
+        return coef * sigma_cor * self.LapFrac(scaled_r)
 
 
 
@@ -239,8 +289,12 @@ class PDE:
 
         else:
             raise NotImplementedError("Domain D not implemented for d > 3")
+        
+        self.w_r_sigma = pcfg.get('w_r_sigma', None)
+        if self.w_r_sigma is not None:
+            self.w_r = _build_gaussian_w_r(mu=self.D[0, 1], sigma=self.w_r_sigma)
 
-        self.CompBox = jnp.vstack([jnp.array([-1., 1.]) for _ in range(self.d)])  # computational box
+        self.CompBox = jnp.vstack([jnp.array([-2., 2.]) for _ in range(self.d)])  # computational box
         
 
         self.anisotropic = kcfg.get('anisotropic', False)
@@ -257,8 +311,10 @@ class PDE:
 
         # copy jnp.D to self.Omega
          # Domain for sampling input weights
+
+        self.annulus_factor = 1.2
         Omega_x = self.D
-        Omega_x = Omega_x.at[0, :].set(2.0 * Omega_x[0, :])
+        Omega_x = Omega_x.at[0, :].set(self.annulus_factor * Omega_x[0, :])
         Omega_s = jnp.array([[-10, 0.0]])
         self.Omega = jnp.vstack([Omega_x, Omega_s])
         
@@ -278,15 +334,14 @@ class PDE:
 
         self.xhat_int, self.xhat_bnd = self.sample_obs(self.Nobs, method=self.method)
         self.xhat = jnp.vstack([self.xhat_int, self.xhat_bnd])
-        print(self.xhat_int)
         self.Nx_int = self.xhat_int.shape[0]
         self.Nx_bnd = self.xhat_bnd.shape[0]
         self.Nx = self.Nx_int + self.Nx_bnd
         # Optimization-related attributes
         self.obj = Objective(self.Nx_int, self.Nx_bnd, scale=self.scale)
 
-        self.Ntest = 200
-        self.test_int, self.test_bnd = self.sample_obs(self.Ntest, method='grid')
+        self.Ntest = 100
+        self.test_int, self.test_bnd = self.sample_test_obs(self.Ntest)
         self.rhs_type = pcfg.get('rhs_type', 'one')
         self._build_exact_sol_rhs(self.rhs_type)
 
@@ -316,44 +371,62 @@ class PDE:
         # actually we should do quadrature in a 
         Ntest_int, Ntest_bnd = int((Ntest-2)**self.d), int((Ntest**self.d) - (Ntest-2)**self.d)
         test_int, test_bnd = sample_cube_obs(self.CompBox, Ntest_int, Ntest_bnd, method="grid")
-        mask_int = jnp.norm(test_int, axis=1) <= 1.0
-        mask_bnd = jnp.norm(test_int, axis=1) > 1.0
+        mask_int = jnp.linalg.norm(test_int, axis=1) < float(self.D[0, 1])
+        mask_bnd = (jnp.linalg.norm(test_int, axis=1) >= float(self.D[0, 1])) & (jnp.linalg.norm(test_int, axis=1) <= self.annulus_factor * float(self.D[0, 1]))
+        # test_bnd is not used here 
         return test_int[mask_int], test_int[mask_bnd]
     
 
     # NEED TO MODIFY BELOW FOR SPHERICAL CASE
     
-    def sample_obs(self, Nobs, method="grid"):
+    def sample_obs(self, Nobs, method="grid", w_r=None):
         """
-        Grid sample in (r, angles) on self.D, map to Euclidean, then split by r<1.
-        Angle axes (ax >= 1) use endpoint=False to avoid duplicating the seam.
-        """
-        if method != "grid":
-            raise NotImplementedError("Only method='grid' is implemented here.")
+        method:
+        - "grid": your original uniform-in-r grid
+        - "grid_weighted_r": same tensor grid over angles, but r-grid is built by inverse-CDF of w_r(r)
 
-        # 1) Build coordinate vectors; drop one endpoint for angles (axes >= 1)
+        w_r: callable weight on r (only used for "grid_weighted_r").
+            Must accept array r and return array weights (>=0).
+        """
+        if method not in ("grid", "grid_weighted_r"):
+            raise NotImplementedError("Only method in {'grid','grid_weighted_r'} implemented here.")
+
+        # ---- 1) coordinate vectors ----
         coords_list = []
         for ax in range(self.d):
-            a, b = 2 * self.D[ax, 0], 2 * self.D[ax, 1]
-            endpoint = (ax == 0)  # r includes endpoint; angles do NOT
-            coords = jnp.linspace(a, b, Nobs, endpoint=endpoint)
+            a, b = 0.0, self.annulus_factor * self.D[ax, 1]
+
+            if ax == 0:
+                # r-axis
+                if method == "grid":
+                    if self.d == 1: 
+                        coords = jnp.linspace(a, b, Nobs//2, endpoint=True)
+                    else:
+                        coords = jnp.linspace(a, b, Nobs, endpoint=True)    
+                else:
+                    if self.w_r is None:
+                        raise ValueError("For method='grid_weighted_r', you must pass w_r(r).")
+                    coords = _build_weighted_r_grid(a, b, Nobs, self.w_r)
+            else:
+                # angles unchanged (endpoint=False as you already do)
+                coords = jnp.linspace(a, b, Nobs, endpoint=False)
+
             coords_list.append(coords)
 
-        # 2) Full tensor grid -> (M, d)
+        # ---- 2) tensor grid ----
         grids = jnp.meshgrid(*coords_list, indexing="ij")
-        mesh = jnp.stack([g.reshape(-1) for g in grids], axis=1)  # (M, d)
+        mesh = jnp.stack([g.reshape(-1) for g in grids], axis=1)
 
-        # 3) Split by r < 1 vs r >= 1 (in parameter space)
+        # ---- 3) split by |r|<1 in parameter space (same as you) ----
         r = mesh[:, 0]
         mask_int = jnp.abs(r) < 1.0
         mesh_int = mesh[mask_int]
         mesh_bnd = mesh[~mask_int]
 
-        # 4) Map to Euclidean
+        # ---- 4) map to Euclidean (same as you) ----
         if self.d == 1:
-            # If d==1, "r" is just x already (no angle)
-            obs_int = mesh_int[:, :1]
-            obs_bnd = mesh_bnd[:, :1]
+            obs_int = jnp.stack([mesh_int[:, :1], -mesh_int[:, :1]], axis=1)
+            obs_bnd = jnp.stack([mesh_bnd[:, :1], -mesh_bnd[:, :1]], axis=1)
         elif self.d == 2:
             obs_int = _polar_to_euclid(mesh_int)
             obs_bnd = _polar_to_euclid(mesh_bnd)
@@ -390,40 +463,46 @@ class PDE:
         return randomx, randoms
 
     def plot_forward(self, x, s, c, suppc):
-        """
-        Plots the forward solution.
-        """
-        # assert self.dim == 3 
 
-        # # Extract the domain range
-        # pO = self.Omega[:-1, :]
-        plt.close('all')  # Close previous figure to prevent multiple windows
+        if self.d == 1:
+            """
+            Plots the forward solution.
+            """
+            # assert self.dim == 3 
 
-        # Create a new figure
-        fig = plt.figure(figsize=(8, 5))
-        ax1 = fig.add_subplot(111)
-        t_x = np.linspace(self.Omega[0, 0]-1, self.Omega[0, 1]+1, 200)
-        # extend this to d-dimensions, by adding d - 1 zeros
-        t = np.zeros((200, self.d))
-        t[:, 0] = t_x
+            # # Extract the domain range
+            # pO = self.Omega[:-1, :]
+            plt.close('all')  # Close previous figure to prevent multiple windows
 
-        f1 = self.ex_sol(t)
-        # Plot exact solution
+            # Create a new figure
+            fig = plt.figure(figsize=(8, 5))
+            ax1 = fig.add_subplot(111)
+            t_x = np.linspace(self.Omega[0, 0]-1, self.Omega[0, 1]+1, 200)
+            # extend this to d-dimensions, by adding d - 1 zeros
+            t = np.zeros((200, self.d))
+            t[:, 0] = t_x
 
-        ax1.plot(t_x, f1, label="Exact Solution")
-    
-        # Compute predicted solution
-        Gu = self.kernel.kappa_X_c_Xhat(x, s, c, t)
-        # sigma is sigmoid of S
-        ax1.plot(t_x, Gu, label="Predicted Solution")
-        sigma = self.kernel.sigma(s).flatten()
-        for i in range(x.shape[0]):
-            if suppc[i]:
-                y_i = self.kernel.kappa_X_c_Xhat(x, s, c, x[i:i+1, :])
-                plt.scatter(x[i], y_i, color='red', s=sigma[i]*300, marker='x')
-        plt.legend()    
-        plt.show(block=False)
-        plt.pause(1.0)  
+            f1 = self.ex_sol(t)
+            # Plot exact solution
+
+            ax1.plot(t_x, f1, label="Exact Solution")
+        
+            # Compute predicted solution
+            Gu = self.kernel.kappa_X_c_Xhat(x, s, c, t)
+            # sigma is sigmoid of S
+            ax1.plot(t_x, Gu, label="Predicted Solution")
+            sigma = self.kernel.sigma(s).flatten()
+            for i in range(x.shape[0]):
+                if suppc[i]:
+                    y_i = self.kernel.kappa_X_c_Xhat(x, s, c, x[i:i+1, :])
+                    plt.scatter(x[i], y_i, color='red', s=sigma[i]*300, marker='x')
+            plt.legend()    
+            plt.show(block=False)
+            plt.pause(1.0)  
+        elif self.d == 2:
+            plot_solution_2d(self, x, s, c, suppc)
+        else:
+            pass
 
 
 
