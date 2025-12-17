@@ -167,7 +167,7 @@ class fracGaussianKernel(GaussianKernel):
 
 
 
-class fracGaussianKernel(MaternKernel):
+class fracMaternKernel(MaternKernel):
     def __init__(self, d, power, sigma_max, sigma_min, frac_order=1.0, 
                     nu=1.5, anisotropic=False, mask=False, D=None):
         super().__init__(d=d, power=power, sigma_max=sigma_max, sigma_min=sigma_min, anisotropic=anisotropic)
