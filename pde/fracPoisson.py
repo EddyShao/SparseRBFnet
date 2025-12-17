@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from src.kernel.Kernels import GaussianKernel
+from src.kernel.Kernels import GaussianKernel, MaternKernel
 from src.utils import Objective, sample_cube_obs, plot_solution_2d
 # from src.fracLapRBF import FractionalLaplacianRBF
 from src.frac.build_interp import make_interp1d_with_custom_deriv
@@ -165,6 +165,87 @@ class fracGaussianKernel(GaussianKernel):
     def DB_kappa(self, x, s, xhat, *args):
         return self.kappa(x, s, xhat)
 
+
+
+class fracGaussianKernel(MaternKernel):
+    def __init__(self, d, power, sigma_max, sigma_min, frac_order=1.0, 
+                    nu=1.5, anisotropic=False, mask=False, D=None):
+        super().__init__(d=d, power=power, sigma_max=sigma_max, sigma_min=sigma_min, anisotropic=anisotropic)
+        self.mask = mask
+        self.D = D
+        self.frac_order = frac_order
+
+        # linear results for computing E and B
+        self.linear_E = (self.Lap_kappa_X_c_Xhat,)
+        self.linear_B = (self.kappa_X_c_Xhat,)
+        self.DE = () 
+        self.DB = ()  
+        if jnp.isclose(nu, 1.5):
+            fracLapfile = f"fracLapRBF_d_{d}_frac_order_{int(frac_order)}_matern32.npz"
+        elif jnp.isclose(nu, 2.5):
+            fracLapfile = f"fracLapRBF_d_{d}_frac_order_{int(frac_order)}_matern52.npz"
+        else:
+            raise NotImplementedError("Only nu=1.5 and nu=2.5 are implemented for fractional Matern kernel.")
+        print("Loading fractional Laplacian RBF data from:", fracLapfile)
+        data = jnp.load(fracLapfile)
+        r = data['r']
+        y_grid = data['y']
+        dy_grid = data['dy']
+        self.LapFrac = make_interp1d_with_custom_deriv(r, y_grid, dy_grid)
+    
+    @partial(jax.jit, static_argnums=(0,))
+    def Lap_kappa_X_c(self, X, S, c, xhat):
+        def Lap_kappa_single(x, s):
+            ell = self.sigma(s)[0]
+            a = jnp.sqrt(2.0 * self.nu) / ell
+            # r = jnp.linalg.norm(x - xhat)
+            r = safe_norm(x - xhat)
+            scaled_r = r * a
+            coef = self._factor(ell) 
+            sigma_cor = a ** (self.frac_order / 2)
+
+            return coef * sigma_cor * self.LapFrac(scaled_r)
+        val = jax.vmap(Lap_kappa_single, in_axes=(0, 0))(X, S)
+
+        return jnp.dot(val.flatten(), c)
+    
+
+    @partial(jax.jit, static_argnums=(0,))
+    def Lap_kappa_X_c_Xhat(self, X, S, c, Xhat): 
+        return jax.vmap(self.Lap_kappa_X_c, in_axes=(None, None, None, 0))(X, S, c, Xhat)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def E_kappa_X_c(self, X, S, c, xhat):
+        return self.Lap_kappa_X_c(X, S, c, xhat)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def B_kappa_X_c(self, X, S, c, xhat):
+        return self.kappa_X_c(X, S, c, xhat)
+    
+    def E_kappa_X_c_Xhat(self, *linear_results):
+        return linear_results[0] 
+
+    def B_kappa_X_c_Xhat(self, *linear_results):
+        return linear_results[0]
+
+    @partial(jax.jit, static_argnums=(0,))
+    def DE_kappa(self, x, s, xhat, *args):
+        ell = self.sigma(s)[0]
+        a = jnp.sqrt(2.0 * self.nu) / ell
+        # r = jnp.linalg.norm(x - xhat)
+        r = safe_norm(x - xhat)
+        scaled_r = r * a
+        
+        coef = self._factor(ell)
+        sigma_cor = a ** (self.frac_order / 2)
+
+        return coef * sigma_cor * self.LapFrac(scaled_r)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def DB_kappa(self, x, s, xhat, *args):
+        return self.kappa(x, s, xhat)
+
+
 def ex_sol(x, frac_order=1., d=3):
     """
     Exact solution for the restricted/integral fractional Laplacian on the unit ball:
@@ -238,6 +319,16 @@ class PDE:
     KERNEL_REGISTRY = {
         "fracGaussian": lambda p, kcfg: fracGaussianKernel(
             d = p.d,
+            power = kcfg.get('power', p.d + p.frac_order + 0.01),
+            sigma_max=kcfg.get("sigma_max", 1.0),
+            sigma_min=kcfg.get("sigma_min", 1e-3),
+            anisotropic=kcfg.get("anisotropic", False),
+            frac_order = p.frac_order,
+            D=p.D
+        ),
+        'fracMatern': lambda p, kcfg: fracMaternKernel(
+            d = p.d,
+            nu = kcfg.get('nu', 1.5),
             power = kcfg.get('power', p.d + p.frac_order + 0.01),
             sigma_max=kcfg.get("sigma_max", 1.0),
             sigma_min=kcfg.get("sigma_min", 1e-3),
