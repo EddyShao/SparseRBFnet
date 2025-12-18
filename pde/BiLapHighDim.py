@@ -739,10 +739,9 @@ def _ex_sol_rpow4d_single(x, q=0.6):
     returns: scalar u(x) = r(x)^q * prod_i sin(pi x_i),
     where r(x) = ||x - x0||, x0 = (0.5,...,0.5).
     """
-    x0 = jnp.array([0.5, 0.5, 0.5, 0.5])
-    r = jnp.linalg.norm(x - x0)
-    s = jnp.prod(jnp.sin(jnp.pi * x))
-    return (r ** q) * s
+    r_squared = jnp.sum((x - 0.5) ** 2)
+    c = 1 / (2 ** q)
+    return c * (r_squared ** (q / 2.0))
 
 
 def ex_sol_rpow4d(x, q=0.6):
@@ -984,7 +983,7 @@ class PDE:
 
         # exact solution and rhs
         self.rhs_type = pcfg.get('rhs_type', 'sines')
-        self._build_exact_sol_rhs(self.rhs_type)
+        self._build_exact_sol_rhs(self.rhs_type, pcfg)
 
     # ---------- helpers ----------
 
@@ -1004,6 +1003,7 @@ class PDE:
                 q = float(pcfg.get('q', 0.6))
             else:
                 q = 0.6
+            print(q)
             self.f = partial(f_rpow4d_bilap, q=q)
             self.ex_sol = partial(ex_sol_rpow4d, q=q)
             self.b = partial(b_rpow4d, q=q)
