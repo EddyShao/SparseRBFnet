@@ -349,7 +349,7 @@ class PDE:
         """
         Plots the forward solution.
         """
-        plot_solution_2d(self, x, s, c, suppc=None)
+        plot_solution_2d(self, x, s, c, suppc=suppc)
         
 
 
