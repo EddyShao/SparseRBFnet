@@ -7,6 +7,7 @@ from src.solver.solver_outer_aux import solve_outer as solve_outer_aux
 from src.solver.solver_first import solve as solve_full_first
 from src.solver.solver_no_boosting import solve as solve_no_boosting
 from src.solver.solver_fixed_size import solve as solve_fixed_size
+from src.solver.solver_fixed_size_smooth import solve as solve_fixed_size_smooth
 
 SOLVER_REGISTRY = {
     "full": solve_full,
@@ -17,6 +18,7 @@ SOLVER_REGISTRY = {
     "full_first": solve_full_first,
     "no_boosting": solve_no_boosting,
     "fixed_size": solve_fixed_size,
+    "fixed_size_smooth": solve_fixed_size_smooth,
 }
 
 

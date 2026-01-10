@@ -229,24 +229,26 @@ class WendlandKernel(_Kernel):
 
     # Wendland \psi_{d,k}(r) for k in {0,1,2}, r >= 0, with unit support (r<=1)
     def _wendland_psi(self, r):
-        r = jnp.maximum(r, 0.0)
+        # r is assumed >= 0
         l = self._l_param()
-        r_compact = jnp.maximum(1.0 - r, 0.0)
+        inside = r < 1.0
+        one_minus = 1.0 - r  # only meaningful inside
 
         if self.k == 0:
-            # C^0
-            psi = r_compact ** (l)
+            psi_inside = one_minus ** l
         elif self.k == 1:
-            # C^2
-            psi = (r_compact ** (l + 1)) * (1.0 + (l + 1.0) * r)
+            psi_inside = (one_minus ** (l + 1)) * (1.0 + (l + 1.0) * r)
         elif self.k == 2:
-            # C^4
             c2 = (l * l + 4.0 * l + 3.0) / 3.0
-            psi = (r_compact ** (l + 2)) * (1.0 + (l + 2.0) * r + c2 * (r * r))
+            psi_inside = (one_minus ** (l + 2)) * (1.0 + (l + 2.0) * r + c2 * (r * r))
+        elif self.k == 5:
+            c2 = (8 + 8 * l + l**2) / 8.0
+            c3 = (48 + 36 * l + 6 * l**2 + l**3) / 48.0
+            psi_inside = (one_minus ** (l + 5)) * (1.0 + (l + 5.0) * r + c2 * (r**2) + c3 * (r**3))
         else:
-            raise ValueError("This implementation currently supports k \in \{0,1,2\}.")
-        
-        return psi
+            raise ValueError("Supported k: {0,1,2,5}.")
+
+        return jnp.where(inside, psi_inside, 0.0)
 
     # PDE-oriented scaling factor: σ^{power} / ( (√(2π) σ)^d )
     def _factor(self, sigma):

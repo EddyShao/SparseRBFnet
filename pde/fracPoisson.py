@@ -98,7 +98,7 @@ class fracGaussianKernel(GaussianKernel):
         self.linear_B = (self.kappa_X_c_Xhat,)
         self.DE = () 
         self.DB = ()  
-        fracLapfile = f"fracLapRBF_d_{d}_frac_order_{int(frac_order)}_gaussian.npz"
+        fracLapfile = f"fracLapRBF_d_{d}_frac_order_{int(frac_order*10)}_gaussian.npz"
         print("Loading fractional Laplacian RBF data from:", fracLapfile)
         data = jnp.load(fracLapfile)
         r = data['r']

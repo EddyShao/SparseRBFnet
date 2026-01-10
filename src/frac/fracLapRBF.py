@@ -331,7 +331,7 @@ if __name__ == "__main__":
         d=args.d,
         frac_order=args.frac_order,
         kernel=args.kernel,
-        kernel_params={'eps': args.eps, 'a': args.a, 'nu': args.nu},
+        kernel_params={'eps': args.eps, 'a': jnp.sqrt(2 * args.nu), 'nu': args.nu},
         h=args.h, N=args.N, M=args.M
     )
     r = jnp.arange(0.0025, 6.0, 0.0025)
@@ -346,12 +346,12 @@ if __name__ == "__main__":
     dy_grid = jnp.concatenate((dy_grid[0:1], dy_grid))
     # save this into a npz file
     if fl.kernel == 'gaussian':
-        jnp.savez(f"fracLapRBF_d_{int(fl.d)}_frac_order_{int(fl.alpha)}_gaussian.npz", r=r, y=y_grid, dy=dy_grid)
+        jnp.savez(f"fracLapRBF_d_{int(fl.d)}_frac_order_{int(fl.alpha*10)}_gaussian.npz", r=r, y=y_grid, dy=dy_grid)
     elif fl.kernel == 'matern':
         if jnp.isclose(args.nu, 1.5):
-            jnp.savez(f"fracLapRBF_d_{int(fl.d)}_frac_order_{int(fl.alpha)}_matern32.npz", r=r, y=y_grid, dy=dy_grid)
+            jnp.savez(f"fracLapRBF_d_{int(fl.d)}_frac_order_{int(fl.alpha*10)}_matern32.npz", r=r, y=y_grid, dy=dy_grid)
         elif jnp.isclose(args.nu, 2.5):
-            jnp.savez(f"fracLapRBF_d_{int(fl.d)}_frac_order_{int(fl.alpha)}_matern52.npz", r=r, y=y_grid, dy=dy_grid)
+            jnp.savez(f"fracLapRBF_d_{int(fl.d)}_frac_order_{int(fl.alpha*10)}_matern52.npz", r=r, y=y_grid, dy=dy_grid)
         else:
             raise NotImplementedError("Only nu=1.5 and nu=2.5 are implemented for fractional Matern kernel.")
     else:
