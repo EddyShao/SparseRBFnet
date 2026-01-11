@@ -12,6 +12,9 @@ from pde.EikonalAniso import PDE as EikonalAnisoPDE  # add if/when needed
 from pde.EikonalAnisoAniso import PDE as EikonalAnisoAnisoPDE  # add if/when needed
 from pde.fracPoisson import PDE as fracPoisson  # add if/when needed
 from pde.BiLapHighDimPos import PDE as BiLapHighDimPos  # add if/when needed
+from pde.LapLinear import PDE as LapLinear  # add if/when needed
+from pde.BiLapLinear import PDE as BiLapLinear  # add if/when needed
+from pde.Regression import PDE as Regression  # add if/when needed
 # from pde.OtherPDE import PDE as OtherPDE  # add if/when needed
 
 
@@ -26,6 +29,9 @@ PDE_CLASS_REGISTRY: Dict[str, Type] = {
     "EikonalAnisoAniso": EikonalAnisoAnisoPDE,
     "fracPoisson": fracPoisson,
     "BiLapHighDimPos": BiLapHighDimPos,
+    "LapLinear": LapLinear,
+    "BiLapLinear": BiLapLinear,
+    "Regression": Regression,
 }
 
 
