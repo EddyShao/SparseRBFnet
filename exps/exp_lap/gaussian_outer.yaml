@@ -1,0 +1,50 @@
+pde:
+  name: "semilinear_high_dim"
+  cls: "SemiLinearHighDim"
+  rhs_type: "rpow4d"
+  rpow4d_alpha: 0.3
+  Nobs_int: 10000
+  Nobs_bnd: 2800
+  d: 4
+  sampling: "grid"
+  power: 6.01
+  scale: 2000
+  init_pad_size: 256
+  add_noise: false
+  Ntest: 20
+
+kernel:
+  type: "gaussian"
+  anisotropic: false
+  sigma_min: 0.001
+  sigma_max: 1.0
+
+solver:
+  # global defaults shared across phases (unless overridden)
+  fp64: true
+  alpha: 1.0e-4
+  T: 3000.0
+  gamma: 0.0
+  Ntrial: 10000
+  blocksize: -1
+  print_every: 100
+  plot_every: 100
+
+  phases:
+    - name: "warmup_outer"
+      solver_name: "outer"         # maps to src.solver_outer.solve_outer
+      max_step: 2000
+      TOL: 1.0e-4
+      plot_final: false
+
+    # - name: "refine_full"
+    #   solver_name: "full"          # maps to src.solver.solve
+    #   max_step: 2000
+    #   TOL: 1.0e-10
+    #   plot_final: true
+
+  homotopy:
+    enabled: true
+    num_levels: 2
+    alpha_factor: 0.1              # alpha <- alpha * 0.1 after each level
+    T_factor: 10                 # T <- T * 10 after each level

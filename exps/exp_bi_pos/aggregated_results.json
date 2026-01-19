@@ -1,0 +1,878 @@
+{
+  "bilap_gaussian": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 674.0,
+          "std": 34.270168433266335
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.013606579788873502,
+          "std": 0.00028443341453086293
+        },
+        "runtime": {
+          "mean": 369.9696380138397,
+          "std": 2.417431338081079
+        }
+      },
+      {
+        "final_supp": {
+          "mean": 786.5,
+          "std": 56.71419575379695
+        },
+        "level_index": 2,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.004823958819052769,
+          "std": 0.0006422911257469691
+        },
+        "runtime": {
+          "mean": 523.8282049655915,
+          "std": 29.422392935078094
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 666,
+            "level_index": 1,
+            "rel_L_2_test": 0.01359422245767957,
+            "runtime": 365.3841869831085
+          },
+          {
+            "final_supp": 768,
+            "level_index": 2,
+            "rel_L_2_test": 0.004678003516968121,
+            "runtime": 519.1670260429382
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_results/bilap_gaussian_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 713,
+            "level_index": 1,
+            "rel_L_2_test": 0.013925274900696592,
+            "runtime": 374.1252017021179
+          },
+          {
+            "final_supp": 899,
+            "level_index": 2,
+            "rel_L_2_test": 0.003392997273292839,
+            "runtime": 546.1450221538544
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_results/bilap_gaussian_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 708,
+            "level_index": 1,
+            "rel_L_2_test": 0.013376156120394282,
+            "runtime": 370.06339168548584
+          },
+          {
+            "final_supp": 807,
+            "level_index": 2,
+            "rel_L_2_test": 0.004588379508143336,
+            "runtime": 531.9089930057526
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_results/bilap_gaussian_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 682,
+            "level_index": 1,
+            "rel_L_2_test": 0.01388741564080393,
+            "runtime": 371.3648958206177
+          },
+          {
+            "final_supp": 822,
+            "level_index": 2,
+            "rel_L_2_test": 0.004435365417672555,
+            "runtime": 532.2726254463196
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_results/bilap_gaussian_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 643,
+            "level_index": 1,
+            "rel_L_2_test": 0.013370590288428453,
+            "runtime": 370.2867569923401
+          },
+          {
+            "final_supp": 734,
+            "level_index": 2,
+            "rel_L_2_test": 0.005415810108578655,
+            "runtime": 497.78329706192017
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_results/bilap_gaussian_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 717,
+            "level_index": 1,
+            "rel_L_2_test": 0.013766327620258286,
+            "runtime": 369.61791133880615
+          },
+          {
+            "final_supp": 786,
+            "level_index": 2,
+            "rel_L_2_test": 0.005391120644971869,
+            "runtime": 569.8912072181702
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_results/bilap_gaussian_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 641,
+            "level_index": 1,
+            "rel_L_2_test": 0.013326957799631027,
+            "runtime": 368.17762899398804
+          },
+          {
+            "final_supp": 690,
+            "level_index": 2,
+            "rel_L_2_test": 0.005612727957132318,
+            "runtime": 502.29926085472107
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_results/bilap_gaussian_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 618,
+            "level_index": 1,
+            "rel_L_2_test": 0.01375076992343746,
+            "runtime": 368.2263958454132
+          },
+          {
+            "final_supp": 815,
+            "level_index": 2,
+            "rel_L_2_test": 0.0046274868849883605,
+            "runtime": 472.30364298820496
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_results/bilap_gaussian_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 657,
+            "level_index": 1,
+            "rel_L_2_test": 0.013144346218102359,
+            "runtime": 370.0590715408325
+          },
+          {
+            "final_supp": 750,
+            "level_index": 2,
+            "rel_L_2_test": 0.005006922728191853,
+            "runtime": 510.4677722454071
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_results/bilap_gaussian_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 695,
+            "level_index": 1,
+            "rel_L_2_test": 0.013923736919303065,
+            "runtime": 372.39093923568726
+          },
+          {
+            "final_supp": 794,
+            "level_index": 2,
+            "rel_L_2_test": 0.005090774150587784,
+            "runtime": 556.0432026386261
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_results/bilap_gaussian_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  },
+  "bilap_gaussian_outer": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 1187.7,
+          "std": 18.696702026471588
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.02631363570722675,
+          "std": 0.0013661863667152282
+        },
+        "runtime": {
+          "mean": 221.1168314218521,
+          "std": 1.0287666477626851
+        }
+      },
+      {
+        "final_supp": {
+          "mean": 2232.4,
+          "std": 20.662365143742218
+        },
+        "level_index": 2,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.00553345213641686,
+          "std": 0.0002893805263833469
+        },
+        "runtime": {
+          "mean": 212.6259381532669,
+          "std": 1.104485227623021
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 1198,
+            "level_index": 1,
+            "rel_L_2_test": 0.02770928689359044,
+            "runtime": 220.1360523700714
+          },
+          {
+            "final_supp": 2208,
+            "level_index": 2,
+            "rel_L_2_test": 0.005860807981502866,
+            "runtime": 211.3298900127411
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_outer_results/bilap_gaussian_outer_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1198,
+            "level_index": 1,
+            "rel_L_2_test": 0.024039920669278538,
+            "runtime": 221.38105726242065
+          },
+          {
+            "final_supp": 2237,
+            "level_index": 2,
+            "rel_L_2_test": 0.0056882018493884514,
+            "runtime": 212.88616514205933
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_outer_results/bilap_gaussian_outer_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1168,
+            "level_index": 1,
+            "rel_L_2_test": 0.026441581884223027,
+            "runtime": 220.91142010688782
+          },
+          {
+            "final_supp": 2222,
+            "level_index": 2,
+            "rel_L_2_test": 0.005252838094209342,
+            "runtime": 211.21007585525513
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_outer_results/bilap_gaussian_outer_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1205,
+            "level_index": 1,
+            "rel_L_2_test": 0.026129372726708792,
+            "runtime": 221.9136040210724
+          },
+          {
+            "final_supp": 2248,
+            "level_index": 2,
+            "rel_L_2_test": 0.005436671593245737,
+            "runtime": 214.33344149589539
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_outer_results/bilap_gaussian_outer_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1167,
+            "level_index": 1,
+            "rel_L_2_test": 0.02644953487236104,
+            "runtime": 220.7958152294159
+          },
+          {
+            "final_supp": 2224,
+            "level_index": 2,
+            "rel_L_2_test": 0.005772024264798218,
+            "runtime": 211.6003303527832
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_outer_results/bilap_gaussian_outer_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1181,
+            "level_index": 1,
+            "rel_L_2_test": 0.025185263395363564,
+            "runtime": 222.08291006088257
+          },
+          {
+            "final_supp": 2199,
+            "level_index": 2,
+            "rel_L_2_test": 0.005828229913630199,
+            "runtime": 212.84213972091675
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_outer_results/bilap_gaussian_outer_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1154,
+            "level_index": 1,
+            "rel_L_2_test": 0.028106329309771878,
+            "runtime": 222.31682181358337
+          },
+          {
+            "final_supp": 2259,
+            "level_index": 2,
+            "rel_L_2_test": 0.005774333988233376,
+            "runtime": 212.84141659736633
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_outer_results/bilap_gaussian_outer_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1198,
+            "level_index": 1,
+            "rel_L_2_test": 0.02755885876065905,
+            "runtime": 219.236750125885
+          },
+          {
+            "final_supp": 2252,
+            "level_index": 2,
+            "rel_L_2_test": 0.005189153810803853,
+            "runtime": 213.11067366600037
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_outer_results/bilap_gaussian_outer_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1204,
+            "level_index": 1,
+            "rel_L_2_test": 0.02454217099173001,
+            "runtime": 220.25021386146545
+          },
+          {
+            "final_supp": 2221,
+            "level_index": 2,
+            "rel_L_2_test": 0.005454745207550731,
+            "runtime": 211.91967248916626
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_outer_results/bilap_gaussian_outer_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1204,
+            "level_index": 1,
+            "rel_L_2_test": 0.02697403756858115,
+            "runtime": 222.14366936683655
+          },
+          {
+            "final_supp": 2254,
+            "level_index": 2,
+            "rel_L_2_test": 0.005077514660805825,
+            "runtime": 214.18557620048523
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_gaussian_outer_results/bilap_gaussian_outer_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  },
+  "bilap_matern": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 766.1,
+          "std": 62.68873724823126
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.02127033549000184,
+          "std": 0.001684053962326737
+        },
+        "runtime": {
+          "mean": 399.4195781469345,
+          "std": 5.284891371550483
+        }
+      },
+      {
+        "final_supp": {
+          "mean": 777.2,
+          "std": 47.38447940928431
+        },
+        "level_index": 2,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.008275490902096009,
+          "std": 0.0005778935867910449
+        },
+        "runtime": {
+          "mean": 438.8662750720978,
+          "std": 124.33906353799857
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 732,
+            "level_index": 1,
+            "rel_L_2_test": 0.022153222282500898,
+            "runtime": 395.51076793670654
+          },
+          {
+            "final_supp": 734,
+            "level_index": 2,
+            "rel_L_2_test": 0.00866049391203623,
+            "runtime": 355.09568524360657
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_results/bilap_matern_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 765,
+            "level_index": 1,
+            "rel_L_2_test": 0.019864442524841562,
+            "runtime": 398.25522112846375
+          },
+          {
+            "final_supp": 757,
+            "level_index": 2,
+            "rel_L_2_test": 0.008365374253292805,
+            "runtime": 304.00144815444946
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_results/bilap_matern_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 821,
+            "level_index": 1,
+            "rel_L_2_test": 0.018735308457451732,
+            "runtime": 401.57404947280884
+          },
+          {
+            "final_supp": 807,
+            "level_index": 2,
+            "rel_L_2_test": 0.007539501417522822,
+            "runtime": 318.54234290122986
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_results/bilap_matern_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 755,
+            "level_index": 1,
+            "rel_L_2_test": 0.023098683118863626,
+            "runtime": 402.6454424858093
+          },
+          {
+            "final_supp": 776,
+            "level_index": 2,
+            "rel_L_2_test": 0.007565824581469558,
+            "runtime": 597.3317642211914
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_results/bilap_matern_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 768,
+            "level_index": 1,
+            "rel_L_2_test": 0.024048844861195025,
+            "runtime": 394.9972276687622
+          },
+          {
+            "final_supp": 777,
+            "level_index": 2,
+            "rel_L_2_test": 0.009045043411654713,
+            "runtime": 667.9941306114197
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_results/bilap_matern_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 819,
+            "level_index": 1,
+            "rel_L_2_test": 0.020460907728256497,
+            "runtime": 403.7238426208496
+          },
+          {
+            "final_supp": 817,
+            "level_index": 2,
+            "rel_L_2_test": 0.007512880265441502,
+            "runtime": 322.8846344947815
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_results/bilap_matern_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 732,
+            "level_index": 1,
+            "rel_L_2_test": 0.02105056416314691,
+            "runtime": 397.90863370895386
+          },
+          {
+            "final_supp": 739,
+            "level_index": 2,
+            "rel_L_2_test": 0.008789768622734328,
+            "runtime": 459.8140199184418
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_results/bilap_matern_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 853,
+            "level_index": 1,
+            "rel_L_2_test": 0.022756052949618428,
+            "runtime": 407.8089473247528
+          },
+          {
+            "final_supp": 855,
+            "level_index": 2,
+            "rel_L_2_test": 0.008049326642333276,
+            "runtime": 385.6675295829773
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_results/bilap_matern_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 628,
+            "level_index": 1,
+            "rel_L_2_test": 0.02069042703099758,
+            "runtime": 389.406432390213
+          },
+          {
+            "final_supp": 696,
+            "level_index": 2,
+            "rel_L_2_test": 0.008821101612446503,
+            "runtime": 479.54264402389526
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_results/bilap_matern_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 788,
+            "level_index": 1,
+            "rel_L_2_test": 0.019844901783146122,
+            "runtime": 402.36521673202515
+          },
+          {
+            "final_supp": 814,
+            "level_index": 2,
+            "rel_L_2_test": 0.008405594302028344,
+            "runtime": 497.788551568985
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_results/bilap_matern_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  },
+  "bilap_matern_outer": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 1874.3,
+          "std": 18.47550931488614
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.045879738444276716,
+          "std": 0.0027370484475827458
+        },
+        "runtime": {
+          "mean": 234.0344034433365,
+          "std": 1.0715195621185463
+        }
+      },
+      {
+        "final_supp": {
+          "mean": 2873.7,
+          "std": 29.435617125441002
+        },
+        "level_index": 2,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.011342118854704755,
+          "std": 0.0008007015688307986
+        },
+        "runtime": {
+          "mean": 266.243781709671,
+          "std": 1.0808591839577495
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 1874,
+            "level_index": 1,
+            "rel_L_2_test": 0.045859725002504806,
+            "runtime": 234.34613490104675
+          },
+          {
+            "final_supp": 2868,
+            "level_index": 2,
+            "rel_L_2_test": 0.011102726515975962,
+            "runtime": 266.8923988342285
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_outer_results/bilap_matern_outer_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1882,
+            "level_index": 1,
+            "rel_L_2_test": 0.045171290216805576,
+            "runtime": 235.30037808418274
+          },
+          {
+            "final_supp": 2885,
+            "level_index": 2,
+            "rel_L_2_test": 0.012530390328555054,
+            "runtime": 266.2287211418152
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_outer_results/bilap_matern_outer_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1860,
+            "level_index": 1,
+            "rel_L_2_test": 0.04489207296318685,
+            "runtime": 234.7725853919983
+          },
+          {
+            "final_supp": 2857,
+            "level_index": 2,
+            "rel_L_2_test": 0.01095875134857942,
+            "runtime": 266.668173789978
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_outer_results/bilap_matern_outer_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1884,
+            "level_index": 1,
+            "rel_L_2_test": 0.04165986021824366,
+            "runtime": 234.09770822525024
+          },
+          {
+            "final_supp": 2875,
+            "level_index": 2,
+            "rel_L_2_test": 0.01003923112291811,
+            "runtime": 265.7405045032501
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_outer_results/bilap_matern_outer_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1908,
+            "level_index": 1,
+            "rel_L_2_test": 0.04121591930552922,
+            "runtime": 231.88528609275818
+          },
+          {
+            "final_supp": 2879,
+            "level_index": 2,
+            "rel_L_2_test": 0.012675991401746639,
+            "runtime": 266.9054431915283
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_outer_results/bilap_matern_outer_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1858,
+            "level_index": 1,
+            "rel_L_2_test": 0.04686232653018179,
+            "runtime": 233.48364901542664
+          },
+          {
+            "final_supp": 2841,
+            "level_index": 2,
+            "rel_L_2_test": 0.011170456087563263,
+            "runtime": 265.6246268749237
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_outer_results/bilap_matern_outer_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1889,
+            "level_index": 1,
+            "rel_L_2_test": 0.049159505553473495,
+            "runtime": 233.40888166427612
+          },
+          {
+            "final_supp": 2912,
+            "level_index": 2,
+            "rel_L_2_test": 0.01108440989708389,
+            "runtime": 267.6159541606903
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_outer_results/bilap_matern_outer_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1854,
+            "level_index": 1,
+            "rel_L_2_test": 0.04795145862875398,
+            "runtime": 233.19919347763062
+          },
+          {
+            "final_supp": 2818,
+            "level_index": 2,
+            "rel_L_2_test": 0.011903297394765375,
+            "runtime": 264.0333642959595
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_outer_results/bilap_matern_outer_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1884,
+            "level_index": 1,
+            "rel_L_2_test": 0.04881069198786255,
+            "runtime": 234.43165254592896
+          },
+          {
+            "final_supp": 2911,
+            "level_index": 2,
+            "rel_L_2_test": 0.010954622095041746,
+            "runtime": 267.37450671195984
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_outer_results/bilap_matern_outer_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1850,
+            "level_index": 1,
+            "rel_L_2_test": 0.047214534036225234,
+            "runtime": 235.41856503486633
+          },
+          {
+            "final_supp": 2891,
+            "level_index": 2,
+            "rel_L_2_test": 0.011001312354818087,
+            "runtime": 265.3541235923767
+          }
+        ],
+        "path": "exps/exp_bi_pos/bilap_matern_outer_results/bilap_matern_outer_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  }
+}

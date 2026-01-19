@@ -1,0 +1,1 @@
+python scripts/solve_pde.py --config exps/exp_ACS/ACS.yaml --seed 200 --save_dir exps/exp_ACS/ACS_results

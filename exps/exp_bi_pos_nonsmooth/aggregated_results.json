@@ -1,0 +1,524 @@
+{
+  "bilap_gaussian": {
+    "final_supp": {
+      "mean": 1111.7,
+      "std": 22.80375212790893
+    },
+    "num_runs": 10,
+    "rel_L_2_test": {
+      "mean": 0.07910666650420792,
+      "std": 0.010214773806922742
+    },
+    "runs": [
+      {
+        "final_supp": 1076,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_results/bilap_gaussian_seed_200.pkl",
+        "rel_L_2_test": 0.09647273990196707,
+        "runtime": 434.78076434135437,
+        "seed": 200
+      },
+      {
+        "final_supp": 1113,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_results/bilap_gaussian_seed_201.pkl",
+        "rel_L_2_test": 0.08686070783831074,
+        "runtime": 447.7600703239441,
+        "seed": 201
+      },
+      {
+        "final_supp": 1109,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_results/bilap_gaussian_seed_202.pkl",
+        "rel_L_2_test": 0.09082052028435184,
+        "runtime": 440.47442841529846,
+        "seed": 202
+      },
+      {
+        "final_supp": 1107,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_results/bilap_gaussian_seed_203.pkl",
+        "rel_L_2_test": 0.07614648620467003,
+        "runtime": 438.2650034427643,
+        "seed": 203
+      },
+      {
+        "final_supp": 1100,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_results/bilap_gaussian_seed_204.pkl",
+        "rel_L_2_test": 0.0771426864714944,
+        "runtime": 465.33237957954407,
+        "seed": 204
+      },
+      {
+        "final_supp": 1116,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_results/bilap_gaussian_seed_205.pkl",
+        "rel_L_2_test": 0.06973344428229876,
+        "runtime": 483.31146693229675,
+        "seed": 205
+      },
+      {
+        "final_supp": 1152,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_results/bilap_gaussian_seed_206.pkl",
+        "rel_L_2_test": 0.06990435116812305,
+        "runtime": 486.58591055870056,
+        "seed": 206
+      },
+      {
+        "final_supp": 1147,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_results/bilap_gaussian_seed_207.pkl",
+        "rel_L_2_test": 0.06350396845832332,
+        "runtime": 493.7548015117645,
+        "seed": 207
+      },
+      {
+        "final_supp": 1099,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_results/bilap_gaussian_seed_208.pkl",
+        "rel_L_2_test": 0.07812220757185138,
+        "runtime": 448.4662284851074,
+        "seed": 208
+      },
+      {
+        "final_supp": 1098,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_results/bilap_gaussian_seed_209.pkl",
+        "rel_L_2_test": 0.0823595528606885,
+        "runtime": 451.8963198661804,
+        "seed": 209
+      }
+    ],
+    "runtime": {
+      "mean": 459.0627373456955,
+      "std": 21.72416135402308
+    }
+  },
+  "bilap_gaussian_low": {
+    "final_supp": {
+      "mean": 1228.5,
+      "std": 110.40355268035736
+    },
+    "num_runs": 10,
+    "rel_L_2_test": {
+      "mean": 0.016903003985330612,
+      "std": 0.0030557658033029144
+    },
+    "runs": [
+      {
+        "final_supp": 1275,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_low_results/bilap_gaussian_low_seed_200.pkl",
+        "rel_L_2_test": 0.016575455474555727,
+        "runtime": 499.1358497142792,
+        "seed": 200
+      },
+      {
+        "final_supp": 1296,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_low_results/bilap_gaussian_low_seed_201.pkl",
+        "rel_L_2_test": 0.015102996588205617,
+        "runtime": 510.97669434547424,
+        "seed": 201
+      },
+      {
+        "final_supp": 1301,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_low_results/bilap_gaussian_low_seed_202.pkl",
+        "rel_L_2_test": 0.014290424388764192,
+        "runtime": 494.26838302612305,
+        "seed": 202
+      },
+      {
+        "final_supp": 1057,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_low_results/bilap_gaussian_low_seed_203.pkl",
+        "rel_L_2_test": 0.02062634944126387,
+        "runtime": 372.17405104637146,
+        "seed": 203
+      },
+      {
+        "final_supp": 1173,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_low_results/bilap_gaussian_low_seed_204.pkl",
+        "rel_L_2_test": 0.016447643298023906,
+        "runtime": 477.54385447502136,
+        "seed": 204
+      },
+      {
+        "final_supp": 1021,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_low_results/bilap_gaussian_low_seed_205.pkl",
+        "rel_L_2_test": 0.023566412161899163,
+        "runtime": 338.68796014785767,
+        "seed": 205
+      },
+      {
+        "final_supp": 1354,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_low_results/bilap_gaussian_low_seed_206.pkl",
+        "rel_L_2_test": 0.014311045764342958,
+        "runtime": 502.57639503479004,
+        "seed": 206
+      },
+      {
+        "final_supp": 1241,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_low_results/bilap_gaussian_low_seed_207.pkl",
+        "rel_L_2_test": 0.018106010849638487,
+        "runtime": 500.36241698265076,
+        "seed": 207
+      },
+      {
+        "final_supp": 1273,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_low_results/bilap_gaussian_low_seed_208.pkl",
+        "rel_L_2_test": 0.015018479474051837,
+        "runtime": 494.8598258495331,
+        "seed": 208
+      },
+      {
+        "final_supp": 1294,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_low_results/bilap_gaussian_low_seed_209.pkl",
+        "rel_L_2_test": 0.01498522241256037,
+        "runtime": 485.76606464385986,
+        "seed": 209
+      }
+    ],
+    "runtime": {
+      "mean": 467.6351495265961,
+      "std": 60.35116855023135
+    }
+  },
+  "bilap_gaussian_med": {
+    "final_supp": {
+      "mean": 1075.8,
+      "std": 44.574033297924075
+    },
+    "num_runs": 10,
+    "rel_L_2_test": {
+      "mean": 0.05165031363434887,
+      "std": 0.011923362443090418
+    },
+    "runs": [
+      {
+        "final_supp": 1132,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_med_results/bilap_gaussian_med_seed_200.pkl",
+        "rel_L_2_test": 0.04180528181363289,
+        "runtime": 489.29328298568726,
+        "seed": 200
+      },
+      {
+        "final_supp": 1133,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_med_results/bilap_gaussian_med_seed_201.pkl",
+        "rel_L_2_test": 0.043757243877267364,
+        "runtime": 482.72739696502686,
+        "seed": 201
+      },
+      {
+        "final_supp": 1011,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_med_results/bilap_gaussian_med_seed_202.pkl",
+        "rel_L_2_test": 0.0761700162785752,
+        "runtime": 336.3864486217499,
+        "seed": 202
+      },
+      {
+        "final_supp": 1015,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_med_results/bilap_gaussian_med_seed_203.pkl",
+        "rel_L_2_test": 0.06870877572155668,
+        "runtime": 336.5110216140747,
+        "seed": 203
+      },
+      {
+        "final_supp": 1041,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_med_results/bilap_gaussian_med_seed_204.pkl",
+        "rel_L_2_test": 0.05605392209637739,
+        "runtime": 370.853230714798,
+        "seed": 204
+      },
+      {
+        "final_supp": 1075,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_med_results/bilap_gaussian_med_seed_205.pkl",
+        "rel_L_2_test": 0.044285808284854976,
+        "runtime": 421.97569608688354,
+        "seed": 205
+      },
+      {
+        "final_supp": 1078,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_med_results/bilap_gaussian_med_seed_206.pkl",
+        "rel_L_2_test": 0.04325496357944903,
+        "runtime": 434.8407907485962,
+        "seed": 206
+      },
+      {
+        "final_supp": 1124,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_med_results/bilap_gaussian_med_seed_207.pkl",
+        "rel_L_2_test": 0.045110718337319056,
+        "runtime": 467.8755967617035,
+        "seed": 207
+      },
+      {
+        "final_supp": 1077,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_med_results/bilap_gaussian_med_seed_208.pkl",
+        "rel_L_2_test": 0.052107795164562154,
+        "runtime": 428.90943694114685,
+        "seed": 208
+      },
+      {
+        "final_supp": 1072,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_gaussian_med_results/bilap_gaussian_med_seed_209.pkl",
+        "rel_L_2_test": 0.04524861118989389,
+        "runtime": 446.8347399234772,
+        "seed": 209
+      }
+    ],
+    "runtime": {
+      "mean": 421.6207641363144,
+      "std": 56.177064906911504
+    }
+  },
+  "bilap_matern": {
+    "final_supp": {
+      "mean": 1632.2,
+      "std": 21.493151363993963
+    },
+    "num_runs": 10,
+    "rel_L_2_test": {
+      "mean": 0.04996585639673895,
+      "std": 0.003019548595578854
+    },
+    "runs": [
+      {
+        "final_supp": 1646,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_results/bilap_matern_seed_200.pkl",
+        "rel_L_2_test": 0.04861648125554453,
+        "runtime": 625.6133155822754,
+        "seed": 200
+      },
+      {
+        "final_supp": 1635,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_results/bilap_matern_seed_201.pkl",
+        "rel_L_2_test": 0.05045654799019018,
+        "runtime": 623.6805791854858,
+        "seed": 201
+      },
+      {
+        "final_supp": 1677,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_results/bilap_matern_seed_202.pkl",
+        "rel_L_2_test": 0.04772378557552329,
+        "runtime": 629.7715322971344,
+        "seed": 202
+      },
+      {
+        "final_supp": 1604,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_results/bilap_matern_seed_203.pkl",
+        "rel_L_2_test": 0.0570651572036417,
+        "runtime": 610.3345246315002,
+        "seed": 203
+      },
+      {
+        "final_supp": 1631,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_results/bilap_matern_seed_204.pkl",
+        "rel_L_2_test": 0.05107888005778947,
+        "runtime": 615.5562567710876,
+        "seed": 204
+      },
+      {
+        "final_supp": 1623,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_results/bilap_matern_seed_205.pkl",
+        "rel_L_2_test": 0.04803761340159038,
+        "runtime": 618.6488337516785,
+        "seed": 205
+      },
+      {
+        "final_supp": 1625,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_results/bilap_matern_seed_206.pkl",
+        "rel_L_2_test": 0.04662206499400322,
+        "runtime": 624.8484044075012,
+        "seed": 206
+      },
+      {
+        "final_supp": 1624,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_results/bilap_matern_seed_207.pkl",
+        "rel_L_2_test": 0.047929810983378986,
+        "runtime": 622.2166616916656,
+        "seed": 207
+      },
+      {
+        "final_supp": 1650,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_results/bilap_matern_seed_208.pkl",
+        "rel_L_2_test": 0.05009591023626373,
+        "runtime": 610.0091462135315,
+        "seed": 208
+      },
+      {
+        "final_supp": 1607,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_results/bilap_matern_seed_209.pkl",
+        "rel_L_2_test": 0.05203231226946397,
+        "runtime": 616.9576885700226,
+        "seed": 209
+      }
+    ],
+    "runtime": {
+      "mean": 619.7636943101883,
+      "std": 6.603599737164705
+    }
+  },
+  "bilap_matern_low": {
+    "final_supp": {
+      "mean": 1557.8,
+      "std": 26.773950856092277
+    },
+    "num_runs": 10,
+    "rel_L_2_test": {
+      "mean": 0.0178620943072691,
+      "std": 0.0007719129877571826
+    },
+    "runs": [
+      {
+        "final_supp": 1514,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_low_results/bilap_matern_low_seed_200.pkl",
+        "rel_L_2_test": 0.018418173740411832,
+        "runtime": 603.6839916706085,
+        "seed": 200
+      },
+      {
+        "final_supp": 1552,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_low_results/bilap_matern_low_seed_201.pkl",
+        "rel_L_2_test": 0.01787178988773244,
+        "runtime": 621.6772904396057,
+        "seed": 201
+      },
+      {
+        "final_supp": 1530,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_low_results/bilap_matern_low_seed_202.pkl",
+        "rel_L_2_test": 0.018534573494865658,
+        "runtime": 597.5849905014038,
+        "seed": 202
+      },
+      {
+        "final_supp": 1555,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_low_results/bilap_matern_low_seed_203.pkl",
+        "rel_L_2_test": 0.018063158690775006,
+        "runtime": 602.5850803852081,
+        "seed": 203
+      },
+      {
+        "final_supp": 1573,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_low_results/bilap_matern_low_seed_204.pkl",
+        "rel_L_2_test": 0.018871549185493643,
+        "runtime": 612.5234262943268,
+        "seed": 204
+      },
+      {
+        "final_supp": 1572,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_low_results/bilap_matern_low_seed_205.pkl",
+        "rel_L_2_test": 0.0181574591996613,
+        "runtime": 618.6191170215607,
+        "seed": 205
+      },
+      {
+        "final_supp": 1600,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_low_results/bilap_matern_low_seed_206.pkl",
+        "rel_L_2_test": 0.017655910623773013,
+        "runtime": 632.4264793395996,
+        "seed": 206
+      },
+      {
+        "final_supp": 1592,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_low_results/bilap_matern_low_seed_207.pkl",
+        "rel_L_2_test": 0.016108452725634072,
+        "runtime": 631.7727048397064,
+        "seed": 207
+      },
+      {
+        "final_supp": 1543,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_low_results/bilap_matern_low_seed_208.pkl",
+        "rel_L_2_test": 0.017349335376270182,
+        "runtime": 624.741809129715,
+        "seed": 208
+      },
+      {
+        "final_supp": 1547,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_low_results/bilap_matern_low_seed_209.pkl",
+        "rel_L_2_test": 0.01759054014807386,
+        "runtime": 619.280036687851,
+        "seed": 209
+      }
+    ],
+    "runtime": {
+      "mean": 616.4894926309586,
+      "std": 12.134999649062769
+    }
+  },
+  "bilap_matern_med": {
+    "final_supp": {
+      "mean": 1628.6,
+      "std": 22.21210880978611
+    },
+    "num_runs": 10,
+    "rel_L_2_test": {
+      "mean": 0.03142427475590169,
+      "std": 0.002757835067377105
+    },
+    "runs": [
+      {
+        "final_supp": 1619,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_med_results/bilap_matern_med_seed_200.pkl",
+        "rel_L_2_test": 0.029467637137799478,
+        "runtime": 624.0948281288147,
+        "seed": 200
+      },
+      {
+        "final_supp": 1605,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_med_results/bilap_matern_med_seed_201.pkl",
+        "rel_L_2_test": 0.031415875532075296,
+        "runtime": 624.2605683803558,
+        "seed": 201
+      },
+      {
+        "final_supp": 1618,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_med_results/bilap_matern_med_seed_202.pkl",
+        "rel_L_2_test": 0.032103176301308184,
+        "runtime": 622.9192025661469,
+        "seed": 202
+      },
+      {
+        "final_supp": 1650,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_med_results/bilap_matern_med_seed_203.pkl",
+        "rel_L_2_test": 0.02892902294178168,
+        "runtime": 632.0758035182953,
+        "seed": 203
+      },
+      {
+        "final_supp": 1610,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_med_results/bilap_matern_med_seed_204.pkl",
+        "rel_L_2_test": 0.03819814474943726,
+        "runtime": 621.4625468254089,
+        "seed": 204
+      },
+      {
+        "final_supp": 1677,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_med_results/bilap_matern_med_seed_205.pkl",
+        "rel_L_2_test": 0.03135706374830798,
+        "runtime": 639.500586271286,
+        "seed": 205
+      },
+      {
+        "final_supp": 1610,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_med_results/bilap_matern_med_seed_206.pkl",
+        "rel_L_2_test": 0.03230550307030712,
+        "runtime": 620.343808889389,
+        "seed": 206
+      },
+      {
+        "final_supp": 1629,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_med_results/bilap_matern_med_seed_207.pkl",
+        "rel_L_2_test": 0.02993977943595185,
+        "runtime": 629.6235218048096,
+        "seed": 207
+      },
+      {
+        "final_supp": 1626,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_med_results/bilap_matern_med_seed_208.pkl",
+        "rel_L_2_test": 0.03204782031371379,
+        "runtime": 633.5982193946838,
+        "seed": 208
+      },
+      {
+        "final_supp": 1642,
+        "path": "exps/exp_bi_pos_nonsmooth/bilap_matern_med_results/bilap_matern_med_seed_209.pkl",
+        "rel_L_2_test": 0.028478724328334294,
+        "runtime": 625.7768402099609,
+        "seed": 209
+      }
+    ],
+    "runtime": {
+      "mean": 627.3655925989151,
+      "std": 6.147926745106749
+    }
+  }
+}

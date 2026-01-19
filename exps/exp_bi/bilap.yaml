@@ -30,15 +30,14 @@ solver:
   plot_every: 100
 
   phases:
-
     - name: "refine_full"
       solver_name: "full_aux"          # maps to src.solver.solve
-      max_step: 2000
+      max_step: 3000
       TOL: 1.0e-10
       plot_final: true
 
   homotopy:
-    enabled: false
-    num_levels: 4
-    alpha_factor: 0.1              # alpha <- alpha * 0.1 after each level
-    T_factor: 10.0                 # T <- T * 10 after each level
+    enabled: true
+    num_levels: 2
+    alpha_factor: 0.01              # alpha <- alpha * 0.1 after each level
+    T_factor: 10                 # T <- T * 10 after each level

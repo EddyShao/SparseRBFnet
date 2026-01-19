@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Base directories
-EXP_DIR="exps/exp_Eikonal_1D"
-LOG_DIR="logs/exp_Eikonal_1D"
+EXP_DIR="exps/exp_Eikonal_Aniso"
+LOG_DIR="logs/exp_Eikonal_Aniso"
 
 # Collect ALL yaml files matching eikonal_*.yaml EXCEPT base.yaml
 YAMLS=($(ls ${EXP_DIR}/eikonal_*.yaml | grep -v "base.yaml"))
 
 # Loop over seeds
-for SEED in {206..209}; do
+for SEED in {200..219}; do
   for CONFIG_PATH in "${YAMLS[@]}"; do
 
     # Extract filename only

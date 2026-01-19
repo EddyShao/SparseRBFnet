@@ -4,8 +4,11 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import os
 
 import jax
+import jax
+jax.config.update("jax_default_matmul_precision", "highest")
 import jax.numpy as jnp
 
 from pde.PDE_REGISTRY import build_pde_from_cfg
@@ -14,7 +17,7 @@ from src.config.base_config import _to_nested_config
 
 
 
-pickle_path = f"exps/exp_Eikonal_Aniso/base_aniso_seed_202.pkl"
+
 
 def plot_solution_2d(p, x, s, c, suppc):
     """
@@ -138,10 +141,12 @@ def plot_exp(pickle_path: str, name: str, level_id: int =2):
 
     plt.clf()
     plot_solution_2d(p, xk_last, sk_last, ck_last, supp_last)
-    plt.savefig(f"exps/exp_Eikonal_Aniso/{name}.png")
+    os.makedirs("exps/exp_Eikonal_Aniso/figs/", exist_ok=True)
+    plt.savefig(f"exps/exp_Eikonal_Aniso/figs/{name}.png")
     plt.show()
 
 if __name__ == "__main__":
-    name_list = ["base_aniso"]
-    for name in name_list:
+    pickle_path_list = [f"exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_{seed}.pkl" for seed in range(200, 219)]
+    for pickle_path in pickle_path_list:
+        name = pickle_path.split("/")[-1].replace(".pkl", "")
         plot_exp(pickle_path, name)

@@ -1,0 +1,958 @@
+{
+  "eikonal_2d_aniso": {
+    "final_supp": {
+      "mean": 10.19047619047619,
+      "std": 0.7496030695673289
+    },
+    "num_runs": 21,
+    "rel_L_2_test": {
+      "mean": 0.9168367916130664,
+      "std": 0.9293283677975621
+    },
+    "runs": [
+      {
+        "final_supp": 12,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_200.pkl",
+        "rel_L_2_test": 0.052717087637434185,
+        "runtime": 149.531476020813,
+        "seed": 200
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_201.pkl",
+        "rel_L_2_test": 1.9653119100802021,
+        "runtime": 148.66140413284302,
+        "seed": 201
+      },
+      {
+        "final_supp": 11,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_202.pkl",
+        "rel_L_2_test": 0.054194969708394915,
+        "runtime": 160.35570859909058,
+        "seed": 202
+      },
+      {
+        "final_supp": 11,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_203.pkl",
+        "rel_L_2_test": 1.9597703100131452,
+        "runtime": 148.78208112716675,
+        "seed": 203
+      },
+      {
+        "final_supp": 9,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_204.pkl",
+        "rel_L_2_test": 0.06188987144005183,
+        "runtime": 148.27889704704285,
+        "seed": 204
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_205.pkl",
+        "rel_L_2_test": 0.05626861192661766,
+        "runtime": 148.41036748886108,
+        "seed": 205
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_206.pkl",
+        "rel_L_2_test": 1.8087838758920818,
+        "runtime": 148.59010648727417,
+        "seed": 206
+      },
+      {
+        "final_supp": 11,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_207.pkl",
+        "rel_L_2_test": 1.9781449317063668,
+        "runtime": 148.47590112686157,
+        "seed": 207
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_208.pkl",
+        "rel_L_2_test": 0.05441662889820044,
+        "runtime": 149.0218415260315,
+        "seed": 208
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_209.pkl",
+        "rel_L_2_test": 0.05255604967106855,
+        "runtime": 148.54807996749878,
+        "seed": 209
+      },
+      {
+        "final_supp": 11,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_210.pkl",
+        "rel_L_2_test": 1.8051907890959824,
+        "runtime": 149.08488512039185,
+        "seed": 210
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_211.pkl",
+        "rel_L_2_test": 1.8950673133414848,
+        "runtime": 149.18618321418762,
+        "seed": 211
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_212.pkl",
+        "rel_L_2_test": 0.054015641896320854,
+        "runtime": 148.75367188453674,
+        "seed": 212
+      },
+      {
+        "final_supp": 11,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_213.pkl",
+        "rel_L_2_test": 1.4825364194521038,
+        "runtime": 148.94871830940247,
+        "seed": 213
+      },
+      {
+        "final_supp": 9,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_214.pkl",
+        "rel_L_2_test": 0.05961112252159647,
+        "runtime": 148.7565360069275,
+        "seed": 214
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_215.pkl",
+        "rel_L_2_test": 1.8952262612802595,
+        "runtime": 147.8873951435089,
+        "seed": 215
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_216.pkl",
+        "rel_L_2_test": 1.8714651323948532,
+        "runtime": 148.89659571647644,
+        "seed": 216
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_217.pkl",
+        "rel_L_2_test": 0.0523941490014877,
+        "runtime": 149.16865944862366,
+        "seed": 217
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_218.pkl",
+        "rel_L_2_test": 0.053735738981229055,
+        "runtime": 149.6580126285553,
+        "seed": 218
+      },
+      {
+        "final_supp": 10,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_219.pkl",
+        "rel_L_2_test": 1.9644434669273965,
+        "runtime": 149.34055829048157,
+        "seed": 219
+      },
+      {
+        "final_supp": 9,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_results/eikonal_2d_aniso_seed_220.pkl",
+        "rel_L_2_test": 0.07583234200812065,
+        "runtime": 159.0513002872467,
+        "seed": 220
+      }
+    ],
+    "runtime": {
+      "mean": 149.87563712256295,
+      "std": 3.3002220184233337
+    }
+  },
+  "eikonal_2d_aniso_new": {
+    "final_supp": {
+      "mean": 30.95,
+      "std": 1.6375527311718607
+    },
+    "num_runs": 20,
+    "rel_L_2_test": {
+      "mean": 0.04082691380369567,
+      "std": 0.0002488361915484305
+    },
+    "runs": [
+      {
+        "final_supp": 32,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_200.pkl",
+        "rel_L_2_test": 0.040814850219939865,
+        "runtime": 112.92545652389526,
+        "seed": 200
+      },
+      {
+        "final_supp": 28,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_201.pkl",
+        "rel_L_2_test": 0.04070194596223204,
+        "runtime": 122.77456784248352,
+        "seed": 201
+      },
+      {
+        "final_supp": 32,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_202.pkl",
+        "rel_L_2_test": 0.040839713486995256,
+        "runtime": 116.7985610961914,
+        "seed": 202
+      },
+      {
+        "final_supp": 32,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_203.pkl",
+        "rel_L_2_test": 0.04099259630839147,
+        "runtime": 123.60483884811401,
+        "seed": 203
+      },
+      {
+        "final_supp": 32,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_204.pkl",
+        "rel_L_2_test": 0.04077884720952289,
+        "runtime": 117.57945728302002,
+        "seed": 204
+      },
+      {
+        "final_supp": 29,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_205.pkl",
+        "rel_L_2_test": 0.04076188328057743,
+        "runtime": 110.46893048286438,
+        "seed": 205
+      },
+      {
+        "final_supp": 30,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_206.pkl",
+        "rel_L_2_test": 0.04080366109019232,
+        "runtime": 112.72520089149475,
+        "seed": 206
+      },
+      {
+        "final_supp": 31,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_207.pkl",
+        "rel_L_2_test": 0.04149280512951431,
+        "runtime": 86.49070954322815,
+        "seed": 207
+      },
+      {
+        "final_supp": 31,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_208.pkl",
+        "rel_L_2_test": 0.0405516337027191,
+        "runtime": 155.78790545463562,
+        "seed": 208
+      },
+      {
+        "final_supp": 33,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_209.pkl",
+        "rel_L_2_test": 0.04037854007330652,
+        "runtime": 99.23719573020935,
+        "seed": 209
+      },
+      {
+        "final_supp": 30,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_210.pkl",
+        "rel_L_2_test": 0.04074677916427766,
+        "runtime": 118.94051671028137,
+        "seed": 210
+      },
+      {
+        "final_supp": 30,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_211.pkl",
+        "rel_L_2_test": 0.04069540690607735,
+        "runtime": 158.34147763252258,
+        "seed": 211
+      },
+      {
+        "final_supp": 33,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_212.pkl",
+        "rel_L_2_test": 0.040852947430845984,
+        "runtime": 122.74921727180481,
+        "seed": 212
+      },
+      {
+        "final_supp": 29,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_213.pkl",
+        "rel_L_2_test": 0.04107455370580581,
+        "runtime": 121.17812490463257,
+        "seed": 213
+      },
+      {
+        "final_supp": 31,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_214.pkl",
+        "rel_L_2_test": 0.04064124685333048,
+        "runtime": 155.80060744285583,
+        "seed": 214
+      },
+      {
+        "final_supp": 34,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_215.pkl",
+        "rel_L_2_test": 0.04128306674929548,
+        "runtime": 86.26225566864014,
+        "seed": 215
+      },
+      {
+        "final_supp": 29,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_216.pkl",
+        "rel_L_2_test": 0.0407202826981744,
+        "runtime": 131.17078304290771,
+        "seed": 216
+      },
+      {
+        "final_supp": 30,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_217.pkl",
+        "rel_L_2_test": 0.04093422379598577,
+        "runtime": 112.73014187812805,
+        "seed": 217
+      },
+      {
+        "final_supp": 30,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_218.pkl",
+        "rel_L_2_test": 0.040875091708374334,
+        "runtime": 127.23211240768433,
+        "seed": 218
+      },
+      {
+        "final_supp": 33,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_results/eikonal_2d_aniso_new_seed_219.pkl",
+        "rel_L_2_test": 0.0405982005983549,
+        "runtime": 143.1186273097992,
+        "seed": 219
+      }
+    ],
+    "runtime": {
+      "mean": 121.79583439826965,
+      "std": 20.08576728853016
+    }
+  },
+  "eikonal_2d_aniso_new_low": {
+    "final_supp": {
+      "mean": 83.5,
+      "std": 12.86570308181693
+    },
+    "num_runs": 20,
+    "rel_L_2_test": {
+      "mean": 0.10141209252480439,
+      "std": 0.3755307123692062
+    },
+    "runs": [
+      {
+        "final_supp": 84,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_200.pkl",
+        "rel_L_2_test": 0.017256067905913598,
+        "runtime": 191.60827660560608,
+        "seed": 200
+      },
+      {
+        "final_supp": 92,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_201.pkl",
+        "rel_L_2_test": 0.0166084860335186,
+        "runtime": 197.81199502944946,
+        "seed": 201
+      },
+      {
+        "final_supp": 83,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_202.pkl",
+        "rel_L_2_test": 0.01803760779305925,
+        "runtime": 194.30527758598328,
+        "seed": 202
+      },
+      {
+        "final_supp": 98,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_203.pkl",
+        "rel_L_2_test": 0.016829349490576392,
+        "runtime": 192.59517073631287,
+        "seed": 203
+      },
+      {
+        "final_supp": 88,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_204.pkl",
+        "rel_L_2_test": 0.01584574337976597,
+        "runtime": 196.0983486175537,
+        "seed": 204
+      },
+      {
+        "final_supp": 91,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_205.pkl",
+        "rel_L_2_test": 0.016982537578119683,
+        "runtime": 192.12135243415833,
+        "seed": 205
+      },
+      {
+        "final_supp": 35,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_206.pkl",
+        "rel_L_2_test": 1.6968588425822437,
+        "runtime": 181.0398669242859,
+        "seed": 206
+      },
+      {
+        "final_supp": 81,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_207.pkl",
+        "rel_L_2_test": 0.018165666035836088,
+        "runtime": 198.1460826396942,
+        "seed": 207
+      },
+      {
+        "final_supp": 83,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_208.pkl",
+        "rel_L_2_test": 0.016925801708940317,
+        "runtime": 196.79538941383362,
+        "seed": 208
+      },
+      {
+        "final_supp": 97,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_209.pkl",
+        "rel_L_2_test": 0.01470278200216775,
+        "runtime": 195.28838634490967,
+        "seed": 209
+      },
+      {
+        "final_supp": 89,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_210.pkl",
+        "rel_L_2_test": 0.01815672049062901,
+        "runtime": 199.98751401901245,
+        "seed": 210
+      },
+      {
+        "final_supp": 87,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_211.pkl",
+        "rel_L_2_test": 0.01759415316220153,
+        "runtime": 198.8943920135498,
+        "seed": 211
+      },
+      {
+        "final_supp": 83,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_212.pkl",
+        "rel_L_2_test": 0.016727202139926994,
+        "runtime": 194.41510319709778,
+        "seed": 212
+      },
+      {
+        "final_supp": 82,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_213.pkl",
+        "rel_L_2_test": 0.0189484226870954,
+        "runtime": 194.29305028915405,
+        "seed": 213
+      },
+      {
+        "final_supp": 91,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_214.pkl",
+        "rel_L_2_test": 0.017953000063985102,
+        "runtime": 194.5177354812622,
+        "seed": 214
+      },
+      {
+        "final_supp": 81,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_215.pkl",
+        "rel_L_2_test": 0.01756563261754255,
+        "runtime": 192.31375527381897,
+        "seed": 215
+      },
+      {
+        "final_supp": 88,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_216.pkl",
+        "rel_L_2_test": 0.01691311005058107,
+        "runtime": 197.25765252113342,
+        "seed": 216
+      },
+      {
+        "final_supp": 77,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_217.pkl",
+        "rel_L_2_test": 0.01912480368614072,
+        "runtime": 194.35696387290955,
+        "seed": 217
+      },
+      {
+        "final_supp": 85,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_218.pkl",
+        "rel_L_2_test": 0.01867979648290255,
+        "runtime": 198.09164118766785,
+        "seed": 218
+      },
+      {
+        "final_supp": 75,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_aniso_new_low_results/eikonal_2d_aniso_new_low_seed_219.pkl",
+        "rel_L_2_test": 0.01836612460494185,
+        "runtime": 198.40905594825745,
+        "seed": 219
+      }
+    ],
+    "runtime": {
+      "mean": 194.91735050678253,
+      "std": 4.092003793858716
+    }
+  },
+  "eikonal_2d_iso": {
+    "final_supp": {
+      "mean": 75.33333333333333,
+      "std": 18.26563257413587
+    },
+    "num_runs": 21,
+    "rel_L_2_test": {
+      "mean": 0.11465989715663627,
+      "std": 0.4206889448451007
+    },
+    "runs": [
+      {
+        "final_supp": 30,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_200.pkl",
+        "rel_L_2_test": 1.9503797159737049,
+        "runtime": 129.85124969482422,
+        "seed": 200
+      },
+      {
+        "final_supp": 56,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_201.pkl",
+        "rel_L_2_test": 0.05471704452056485,
+        "runtime": 137.19058346748352,
+        "seed": 201
+      },
+      {
+        "final_supp": 84,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_202.pkl",
+        "rel_L_2_test": 0.022479592029415754,
+        "runtime": 135.13893508911133,
+        "seed": 202
+      },
+      {
+        "final_supp": 69,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_203.pkl",
+        "rel_L_2_test": 0.023901847156433023,
+        "runtime": 133.11357426643372,
+        "seed": 203
+      },
+      {
+        "final_supp": 73,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_204.pkl",
+        "rel_L_2_test": 0.02213210474550085,
+        "runtime": 133.64520812034607,
+        "seed": 204
+      },
+      {
+        "final_supp": 101,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_205.pkl",
+        "rel_L_2_test": 0.01804541896842496,
+        "runtime": 135.309588432312,
+        "seed": 205
+      },
+      {
+        "final_supp": 86,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_206.pkl",
+        "rel_L_2_test": 0.018285337905809274,
+        "runtime": 133.33669328689575,
+        "seed": 206
+      },
+      {
+        "final_supp": 90,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_207.pkl",
+        "rel_L_2_test": 0.021604697546238574,
+        "runtime": 134.40458488464355,
+        "seed": 207
+      },
+      {
+        "final_supp": 67,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_208.pkl",
+        "rel_L_2_test": 0.020306934146283963,
+        "runtime": 131.92245650291443,
+        "seed": 208
+      },
+      {
+        "final_supp": 47,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_209.pkl",
+        "rel_L_2_test": 0.02745152476442661,
+        "runtime": 119.49545550346375,
+        "seed": 209
+      },
+      {
+        "final_supp": 59,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_210.pkl",
+        "rel_L_2_test": 0.024823973970986717,
+        "runtime": 131.79228162765503,
+        "seed": 210
+      },
+      {
+        "final_supp": 92,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_211.pkl",
+        "rel_L_2_test": 0.018220545758187927,
+        "runtime": 136.02581214904785,
+        "seed": 211
+      },
+      {
+        "final_supp": 78,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_212.pkl",
+        "rel_L_2_test": 0.01963437895394433,
+        "runtime": 133.0505621433258,
+        "seed": 212
+      },
+      {
+        "final_supp": 54,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_213.pkl",
+        "rel_L_2_test": 0.026653198274454476,
+        "runtime": 129.8922996520996,
+        "seed": 213
+      },
+      {
+        "final_supp": 100,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_214.pkl",
+        "rel_L_2_test": 0.0178394316894269,
+        "runtime": 136.97938323020935,
+        "seed": 214
+      },
+      {
+        "final_supp": 72,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_215.pkl",
+        "rel_L_2_test": 0.020346389979606007,
+        "runtime": 133.89803051948547,
+        "seed": 215
+      },
+      {
+        "final_supp": 81,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_216.pkl",
+        "rel_L_2_test": 0.020345275163716627,
+        "runtime": 134.5817151069641,
+        "seed": 216
+      },
+      {
+        "final_supp": 91,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_217.pkl",
+        "rel_L_2_test": 0.020582455248068867,
+        "runtime": 135.41249442100525,
+        "seed": 217
+      },
+      {
+        "final_supp": 91,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_218.pkl",
+        "rel_L_2_test": 0.017151943603535034,
+        "runtime": 133.94109630584717,
+        "seed": 218
+      },
+      {
+        "final_supp": 86,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_219.pkl",
+        "rel_L_2_test": 0.020131259136861798,
+        "runtime": 134.88015699386597,
+        "seed": 219
+      },
+      {
+        "final_supp": 75,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_results/eikonal_2d_iso_seed_220.pkl",
+        "rel_L_2_test": 0.022824770753770672,
+        "runtime": 133.5097200870514,
+        "seed": 220
+      }
+    ],
+    "runtime": {
+      "mean": 133.20818483261834,
+      "std": 3.690818244852394
+    }
+  },
+  "eikonal_2d_iso_new": {
+    "final_supp": {
+      "mean": 56.3,
+      "std": 6.061960773631963
+    },
+    "num_runs": 20,
+    "rel_L_2_test": {
+      "mean": 0.2059332901533688,
+      "std": 0.467857807371788
+    },
+    "runs": [
+      {
+        "final_supp": 59,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_200.pkl",
+        "rel_L_2_test": 0.054290600972875934,
+        "runtime": 122.56212711334229,
+        "seed": 200
+      },
+      {
+        "final_supp": 56,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_201.pkl",
+        "rel_L_2_test": 0.05471704452056485,
+        "runtime": 136.82720160484314,
+        "seed": 201
+      },
+      {
+        "final_supp": 62,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_202.pkl",
+        "rel_L_2_test": 0.05506436110703603,
+        "runtime": 150.58484268188477,
+        "seed": 202
+      },
+      {
+        "final_supp": 59,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_203.pkl",
+        "rel_L_2_test": 0.05529501433243585,
+        "runtime": 118.05031442642212,
+        "seed": 203
+      },
+      {
+        "final_supp": 65,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_204.pkl",
+        "rel_L_2_test": 0.05532426432795602,
+        "runtime": 149.81574821472168,
+        "seed": 204
+      },
+      {
+        "final_supp": 49,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_205.pkl",
+        "rel_L_2_test": 0.05475225869728825,
+        "runtime": 90.24424266815186,
+        "seed": 205
+      },
+      {
+        "final_supp": 49,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_206.pkl",
+        "rel_L_2_test": 0.05471953480920034,
+        "runtime": 84.8330225944519,
+        "seed": 206
+      },
+      {
+        "final_supp": 61,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_207.pkl",
+        "rel_L_2_test": 0.05446719029885044,
+        "runtime": 124.24482250213623,
+        "seed": 207
+      },
+      {
+        "final_supp": 64,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_208.pkl",
+        "rel_L_2_test": 0.054865427104850525,
+        "runtime": 149.89824414253235,
+        "seed": 208
+      },
+      {
+        "final_supp": 49,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_209.pkl",
+        "rel_L_2_test": 0.0537204275265697,
+        "runtime": 138.99990129470825,
+        "seed": 209
+      },
+      {
+        "final_supp": 65,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_210.pkl",
+        "rel_L_2_test": 1.4165702524513417,
+        "runtime": 140.2357952594757,
+        "seed": 210
+      },
+      {
+        "final_supp": 48,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_211.pkl",
+        "rel_L_2_test": 1.7165243833624004,
+        "runtime": 138.77802205085754,
+        "seed": 211
+      },
+      {
+        "final_supp": 53,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_212.pkl",
+        "rel_L_2_test": 0.05443045978777309,
+        "runtime": 149.40994954109192,
+        "seed": 212
+      },
+      {
+        "final_supp": 63,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_213.pkl",
+        "rel_L_2_test": 0.054558946216937784,
+        "runtime": 144.03119111061096,
+        "seed": 213
+      },
+      {
+        "final_supp": 56,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_214.pkl",
+        "rel_L_2_test": 0.05435100282408466,
+        "runtime": 149.79059982299805,
+        "seed": 214
+      },
+      {
+        "final_supp": 53,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_215.pkl",
+        "rel_L_2_test": 0.05463209614114455,
+        "runtime": 120.77793765068054,
+        "seed": 215
+      },
+      {
+        "final_supp": 50,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_216.pkl",
+        "rel_L_2_test": 0.0551644494508876,
+        "runtime": 138.90930914878845,
+        "seed": 216
+      },
+      {
+        "final_supp": 62,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_217.pkl",
+        "rel_L_2_test": 0.05669507633301408,
+        "runtime": 148.74965596199036,
+        "seed": 217
+      },
+      {
+        "final_supp": 53,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_218.pkl",
+        "rel_L_2_test": 0.0543986522485724,
+        "runtime": 121.43135356903076,
+        "seed": 218
+      },
+      {
+        "final_supp": 50,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_results/eikonal_2d_iso_new_seed_219.pkl",
+        "rel_L_2_test": 0.05412436055359188,
+        "runtime": 120.26400423049927,
+        "seed": 219
+      }
+    ],
+    "runtime": {
+      "mean": 131.9219142794609,
+      "std": 19.124502436899967
+    }
+  },
+  "eikonal_2d_iso_new_low": {
+    "final_supp": {
+      "mean": 87.2,
+      "std": 12.297196942050613
+    },
+    "num_runs": 20,
+    "rel_L_2_test": {
+      "mean": 0.20663842783451886,
+      "std": 0.5589260101474863
+    },
+    "runs": [
+      {
+        "final_supp": 79,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_200.pkl",
+        "rel_L_2_test": 1.9624479260149488,
+        "runtime": 148.3554379940033,
+        "seed": 200
+      },
+      {
+        "final_supp": 102,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_201.pkl",
+        "rel_L_2_test": 0.02088848317485294,
+        "runtime": 142.46272325515747,
+        "seed": 201
+      },
+      {
+        "final_supp": 83,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_202.pkl",
+        "rel_L_2_test": 0.028602665288098593,
+        "runtime": 144.8184552192688,
+        "seed": 202
+      },
+      {
+        "final_supp": 79,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_203.pkl",
+        "rel_L_2_test": 0.030094436592191503,
+        "runtime": 144.60753059387207,
+        "seed": 203
+      },
+      {
+        "final_supp": 83,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_204.pkl",
+        "rel_L_2_test": 0.02447497372295345,
+        "runtime": 141.69803404808044,
+        "seed": 204
+      },
+      {
+        "final_supp": 82,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_205.pkl",
+        "rel_L_2_test": 0.028406622546457483,
+        "runtime": 152.36065006256104,
+        "seed": 205
+      },
+      {
+        "final_supp": 107,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_206.pkl",
+        "rel_L_2_test": 0.02543731376008474,
+        "runtime": 144.40506410598755,
+        "seed": 206
+      },
+      {
+        "final_supp": 76,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_207.pkl",
+        "rel_L_2_test": 0.030083411181204642,
+        "runtime": 145.657062292099,
+        "seed": 207
+      },
+      {
+        "final_supp": 83,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_208.pkl",
+        "rel_L_2_test": 0.030511312564935927,
+        "runtime": 144.14779710769653,
+        "seed": 208
+      },
+      {
+        "final_supp": 106,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_209.pkl",
+        "rel_L_2_test": 0.020133191231817952,
+        "runtime": 143.9818971157074,
+        "seed": 209
+      },
+      {
+        "final_supp": 55,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_210.pkl",
+        "rel_L_2_test": 1.7106783062454587,
+        "runtime": 137.61622071266174,
+        "seed": 210
+      },
+      {
+        "final_supp": 78,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_211.pkl",
+        "rel_L_2_test": 0.027271345621076592,
+        "runtime": 144.91783809661865,
+        "seed": 211
+      },
+      {
+        "final_supp": 99,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_212.pkl",
+        "rel_L_2_test": 0.02294709382225541,
+        "runtime": 142.50964641571045,
+        "seed": 212
+      },
+      {
+        "final_supp": 95,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_213.pkl",
+        "rel_L_2_test": 0.02156575476437998,
+        "runtime": 139.89423274993896,
+        "seed": 213
+      },
+      {
+        "final_supp": 84,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_214.pkl",
+        "rel_L_2_test": 0.026915077025699414,
+        "runtime": 144.21842217445374,
+        "seed": 214
+      },
+      {
+        "final_supp": 94,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_215.pkl",
+        "rel_L_2_test": 0.02366740426608601,
+        "runtime": 146.57366824150085,
+        "seed": 215
+      },
+      {
+        "final_supp": 86,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_216.pkl",
+        "rel_L_2_test": 0.02169852719584275,
+        "runtime": 142.9475028514862,
+        "seed": 216
+      },
+      {
+        "final_supp": 99,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_217.pkl",
+        "rel_L_2_test": 0.024323529652146774,
+        "runtime": 143.86520504951477,
+        "seed": 217
+      },
+      {
+        "final_supp": 82,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_218.pkl",
+        "rel_L_2_test": 0.028835348342746623,
+        "runtime": 152.6619017124176,
+        "seed": 218
+      },
+      {
+        "final_supp": 92,
+        "path": "exps/exp_Eikonal_Aniso/eikonal_2d_iso_new_low_results/eikonal_2d_iso_new_low_seed_219.pkl",
+        "rel_L_2_test": 0.023785833677139295,
+        "runtime": 142.723247051239,
+        "seed": 219
+      }
+    ],
+    "runtime": {
+      "mean": 144.52112684249877,
+      "std": 3.5555868445761507
+    }
+  }
+}

@@ -1,0 +1,1 @@
+python scripts/bilap_vis.py --config exps/vis_bilap/bilap_gaussian.yaml

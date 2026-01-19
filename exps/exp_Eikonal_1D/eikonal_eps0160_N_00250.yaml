@@ -1,0 +1,40 @@
+pde:
+  name: Eikonal-1D
+  cls: Eikonal
+  rhs_type: ones
+  Nobs_int: 249
+  Nobs_bnd: 2
+  d: 1
+  sampling: grid
+  power: 3.01
+  epsilon: 0.00625
+  scale: 100
+  init_pad_size: 16
+  add_noise: false
+  Ntest: 50000
+kernel:
+  type: gaussian
+  anisotropic: false
+  sigma_min: 0.001
+  sigma_max: 1.0
+solver:
+  fp64: true
+  alpha: 1.0e-08
+  T: 5e-1
+  gamma: 0.0
+  Ntrial: 10000
+  blocksize: -1
+  print_every: 100
+  plot_every: 100
+  mask: true
+  phases:
+  - name: full_second
+    solver_name: full
+    max_step: 3000
+    TOL: 1.0e-20
+    plot_final: true
+  homotopy:
+    enabled: false
+    num_levels: 3
+    alpha_factor: 0.1
+    T_factor: 10.0

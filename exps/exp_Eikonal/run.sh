@@ -1,5 +1,46 @@
-# python scripts/solve_pde.py --config exps/exp_2D/first_order.yaml --seed 200 --save_dir exps/exp_2D/first_order_results
-# python scripts/solve_pde.py --config exps/exp_2D/second_order_full.yaml --seed 200 --save_dir exps/exp_2D/second_order_full_results
-# python scripts/solve_pde.py --config exps/exp_2D/second_order_outer.yaml --seed 200 --save_dir exps/exp_2D/second_order_outer_results
-# python scripts/solve_pde.py --config exps/exp_2D/first_order_full.yaml --seed 200 --save_dir exps/exp_2D/first_order_full_results
-python scripts/solve_pde.py --config exps/exp_Eikonal/second_order_full.yaml --seed 200 --save_dir exps/exp_Eikonal/second_order_full_results
+#!/bin/bash
+
+# Base directories
+EXP_DIR="exps/exp_Eikonal"
+LOG_DIR="logs/exp_eikonal"
+
+# Collect ALL yaml files matching eikonal_*.yaml EXCEPT base.yaml
+YAMLS=($(ls ${EXP_DIR}/eikonal_*.yaml | grep -v "base.yaml"))
+
+# Loop over seeds
+for SEED in {200..204}; do
+  for CONFIG_PATH in "${YAMLS[@]}"; do
+
+    # Extract filename only
+    CFG=$(basename "$CONFIG_PATH")
+
+    # Remove .yaml → base name
+    BASE="${CFG%.yaml}"
+
+    # Save directory for solver output
+    SAVE_DIR="${EXP_DIR}/${BASE}_results"
+
+    # Log directory + file
+    LOG_SAVE_DIR="${LOG_DIR}/${BASE}_results"
+    LOG_FILE="${LOG_SAVE_DIR}/${SEED}.log"
+
+    # Create directories if not existing
+    mkdir -p "${SAVE_DIR}"
+    mkdir -p "${LOG_SAVE_DIR}"
+
+    echo "--------------------------------------------------"
+    echo "Running config: $CONFIG_PATH"
+    echo "Seed: $SEED"
+    echo "Results → $SAVE_DIR"
+    echo "Log → $LOG_FILE"
+    echo "--------------------------------------------------"
+
+    # Execute solver and write log
+    python scripts/solve_pde.py \
+        --config "$CONFIG_PATH" \
+        --seed "$SEED" \
+        --save_dir "$SAVE_DIR" \
+        > "$LOG_FILE" 2>&1
+
+  done
+done

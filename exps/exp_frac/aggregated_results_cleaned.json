@@ -1,0 +1,258 @@
+{
+  "frac_gaussain_2d": {
+    "final_supp": {
+      "mean": 362.1111111111111,
+      "std": 16.230591448417155
+    },
+    "num_runs": 9,
+    "rel_L_2_test": {
+      "mean": 0.08700118285827325,
+      "std": 0.0031850062595114178
+    },
+    "runs": [
+      {
+        "final_supp": 369,
+        "path": "exps/exp_frac/frac_gaussain_2d_results/frac_gaussain_2d_seed_200.pkl",
+        "rel_L_2_test": 0.09119269903438433,
+        "runtime": 282.89719676971436,
+        "seed": 200
+      },
+      {
+        "final_supp": 327,
+        "path": "exps/exp_frac/frac_gaussain_2d_results/frac_gaussain_2d_seed_202.pkl",
+        "rel_L_2_test": 0.08856962536502888,
+        "runtime": 279.8344392776489,
+        "seed": 202
+      },
+      {
+        "final_supp": 358,
+        "path": "exps/exp_frac/frac_gaussain_2d_results/frac_gaussain_2d_seed_203.pkl",
+        "rel_L_2_test": 0.08922224897919245,
+        "runtime": 281.36245560646057,
+        "seed": 203
+      },
+      {
+        "final_supp": 358,
+        "path": "exps/exp_frac/frac_gaussain_2d_results/frac_gaussain_2d_seed_204.pkl",
+        "rel_L_2_test": 0.09078734917112082,
+        "runtime": 279.73875164985657,
+        "seed": 204
+      },
+      {
+        "final_supp": 380,
+        "path": "exps/exp_frac/frac_gaussain_2d_results/frac_gaussain_2d_seed_205.pkl",
+        "rel_L_2_test": 0.08410456774228457,
+        "runtime": 279.2498519420624,
+        "seed": 205
+      },
+      {
+        "final_supp": 362,
+        "path": "exps/exp_frac/frac_gaussain_2d_results/frac_gaussain_2d_seed_206.pkl",
+        "rel_L_2_test": 0.08334716061668769,
+        "runtime": 278.8241379261017,
+        "seed": 206
+      },
+      {
+        "final_supp": 379,
+        "path": "exps/exp_frac/frac_gaussain_2d_results/frac_gaussain_2d_seed_207.pkl",
+        "rel_L_2_test": 0.08428737674048134,
+        "runtime": 281.2042031288147,
+        "seed": 207
+      },
+      {
+        "final_supp": 348,
+        "path": "exps/exp_frac/frac_gaussain_2d_results/frac_gaussain_2d_seed_208.pkl",
+        "rel_L_2_test": 0.08889325458746479,
+        "runtime": 277.5408318042755,
+        "seed": 208
+      },
+      {
+        "final_supp": 378,
+        "path": "exps/exp_frac/frac_gaussain_2d_results/frac_gaussain_2d_seed_209.pkl",
+        "rel_L_2_test": 0.08260636348781444,
+        "runtime": 278.5809235572815,
+        "seed": 209
+      }
+    ],
+    "runtime": {
+      "mean": 279.91475462913513,
+      "std": 1.5541006531903765
+    },
+    "num_runs_raw": 10,
+    "filter_rule": "rel_L_2_test <= 3.0 * min(rel_L_2_test)",
+    "threshold": 0.24781909046344333
+  },
+  "frac_gaussain_2d_big_frac": {
+    "final_supp": {
+      "mean": 370.5,
+      "std": 9.243916918709298
+    },
+    "num_runs": 10,
+    "rel_L_2_test": {
+      "mean": 0.040535014890574074,
+      "std": 0.0003789240414054279
+    },
+    "runs": [
+      {
+        "final_supp": 377,
+        "path": "exps/exp_frac/frac_gaussain_2d_big_frac_results/frac_gaussain_2d_big_frac_seed_200.pkl",
+        "rel_L_2_test": 0.040742893361110366,
+        "runtime": 274.1322042942047,
+        "seed": 200
+      },
+      {
+        "final_supp": 373,
+        "path": "exps/exp_frac/frac_gaussain_2d_big_frac_results/frac_gaussain_2d_big_frac_seed_201.pkl",
+        "rel_L_2_test": 0.040369450880202745,
+        "runtime": 256.36421036720276,
+        "seed": 201
+      },
+      {
+        "final_supp": 386,
+        "path": "exps/exp_frac/frac_gaussain_2d_big_frac_results/frac_gaussain_2d_big_frac_seed_202.pkl",
+        "rel_L_2_test": 0.04007420190838917,
+        "runtime": 270.3155083656311,
+        "seed": 202
+      },
+      {
+        "final_supp": 377,
+        "path": "exps/exp_frac/frac_gaussain_2d_big_frac_results/frac_gaussain_2d_big_frac_seed_203.pkl",
+        "rel_L_2_test": 0.039861193148665715,
+        "runtime": 258.9878902435303,
+        "seed": 203
+      },
+      {
+        "final_supp": 371,
+        "path": "exps/exp_frac/frac_gaussain_2d_big_frac_results/frac_gaussain_2d_big_frac_seed_204.pkl",
+        "rel_L_2_test": 0.04031537893569236,
+        "runtime": 256.76980996131897,
+        "seed": 204
+      },
+      {
+        "final_supp": 379,
+        "path": "exps/exp_frac/frac_gaussain_2d_big_frac_results/frac_gaussain_2d_big_frac_seed_205.pkl",
+        "rel_L_2_test": 0.04089774212470727,
+        "runtime": 271.99309182167053,
+        "seed": 205
+      },
+      {
+        "final_supp": 360,
+        "path": "exps/exp_frac/frac_gaussain_2d_big_frac_results/frac_gaussain_2d_big_frac_seed_206.pkl",
+        "rel_L_2_test": 0.04088652664885889,
+        "runtime": 278.9063096046448,
+        "seed": 206
+      },
+      {
+        "final_supp": 356,
+        "path": "exps/exp_frac/frac_gaussain_2d_big_frac_results/frac_gaussain_2d_big_frac_seed_207.pkl",
+        "rel_L_2_test": 0.040686783005754075,
+        "runtime": 279.59723448753357,
+        "seed": 207
+      },
+      {
+        "final_supp": 366,
+        "path": "exps/exp_frac/frac_gaussain_2d_big_frac_results/frac_gaussain_2d_big_frac_seed_208.pkl",
+        "rel_L_2_test": 0.040388540758175225,
+        "runtime": 262.1168658733368,
+        "seed": 208
+      },
+      {
+        "final_supp": 360,
+        "path": "exps/exp_frac/frac_gaussain_2d_big_frac_results/frac_gaussain_2d_big_frac_seed_209.pkl",
+        "rel_L_2_test": 0.04112743813418495,
+        "runtime": 269.72344279289246,
+        "seed": 209
+      }
+    ],
+    "runtime": {
+      "mean": 267.8906567811966,
+      "std": 8.321914332103075
+    },
+    "num_runs_raw": 10,
+    "filter_rule": "rel_L_2_test <= 3.0 * min(rel_L_2_test)",
+    "threshold": 0.11958357944599715
+  },
+  "frac_gaussain_2d_small_frac": {
+    "final_supp": {
+      "mean": 328.6666666666667,
+      "std": 13.199326582148887
+    },
+    "num_runs": 9,
+    "rel_L_2_test": {
+      "mean": 0.11195922922623083,
+      "std": 0.0025331489669634766
+    },
+    "runs": [
+      {
+        "final_supp": 345,
+        "path": "exps/exp_frac/frac_gaussain_2d_small_frac_results/frac_gaussain_2d_small_frac_seed_200.pkl",
+        "rel_L_2_test": 0.1132006484375742,
+        "runtime": 275.43981528282166,
+        "seed": 200
+      },
+      {
+        "final_supp": 344,
+        "path": "exps/exp_frac/frac_gaussain_2d_small_frac_results/frac_gaussain_2d_small_frac_seed_201.pkl",
+        "rel_L_2_test": 0.10997733092792569,
+        "runtime": 282.0391917228699,
+        "seed": 201
+      },
+      {
+        "final_supp": 314,
+        "path": "exps/exp_frac/frac_gaussain_2d_small_frac_results/frac_gaussain_2d_small_frac_seed_202.pkl",
+        "rel_L_2_test": 0.11500136368198206,
+        "runtime": 276.7263717651367,
+        "seed": 202
+      },
+      {
+        "final_supp": 328,
+        "path": "exps/exp_frac/frac_gaussain_2d_small_frac_results/frac_gaussain_2d_small_frac_seed_203.pkl",
+        "rel_L_2_test": 0.11225871852808728,
+        "runtime": 277.3323953151703,
+        "seed": 203
+      },
+      {
+        "final_supp": 341,
+        "path": "exps/exp_frac/frac_gaussain_2d_small_frac_results/frac_gaussain_2d_small_frac_seed_205.pkl",
+        "rel_L_2_test": 0.10622014651057732,
+        "runtime": 277.8100175857544,
+        "seed": 205
+      },
+      {
+        "final_supp": 337,
+        "path": "exps/exp_frac/frac_gaussain_2d_small_frac_results/frac_gaussain_2d_small_frac_seed_206.pkl",
+        "rel_L_2_test": 0.11147417534921979,
+        "runtime": 276.26568627357483,
+        "seed": 206
+      },
+      {
+        "final_supp": 306,
+        "path": "exps/exp_frac/frac_gaussain_2d_small_frac_results/frac_gaussain_2d_small_frac_seed_207.pkl",
+        "rel_L_2_test": 0.11188836878015442,
+        "runtime": 276.74313044548035,
+        "seed": 207
+      },
+      {
+        "final_supp": 319,
+        "path": "exps/exp_frac/frac_gaussain_2d_small_frac_results/frac_gaussain_2d_small_frac_seed_208.pkl",
+        "rel_L_2_test": 0.112594001697797,
+        "runtime": 275.6495213508606,
+        "seed": 208
+      },
+      {
+        "final_supp": 324,
+        "path": "exps/exp_frac/frac_gaussain_2d_small_frac_results/frac_gaussain_2d_small_frac_seed_209.pkl",
+        "rel_L_2_test": 0.11501830912275984,
+        "runtime": 277.8520317077637,
+        "seed": 209
+      }
+    ],
+    "runtime": {
+      "mean": 277.31757349438135,
+      "std": 1.8534169653768109
+    },
+    "num_runs_raw": 9,
+    "filter_rule": "rel_L_2_test <= 3.0 * min(rel_L_2_test)",
+    "threshold": 0.31866043953173195
+  }
+}

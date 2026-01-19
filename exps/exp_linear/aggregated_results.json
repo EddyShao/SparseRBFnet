@@ -1,0 +1,1289 @@
+{
+  "bilap_gaussian": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 919.7,
+          "std": 13.14069167805781
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.015143922996098211,
+          "std": 0.0005103523401527555
+        },
+        "runtime": {
+          "mean": 262.7710126399994,
+          "std": 0.7001333935867659
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 904,
+            "level_index": 1,
+            "rel_L_2_test": 0.015309527255343066,
+            "runtime": 264.2779312133789
+          }
+        ],
+        "path": "exps/exp_linear/bilap_gaussian_results/bilap_gaussian_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 924,
+            "level_index": 1,
+            "rel_L_2_test": 0.015705658854097915,
+            "runtime": 262.55806946754456
+          }
+        ],
+        "path": "exps/exp_linear/bilap_gaussian_results/bilap_gaussian_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 896,
+            "level_index": 1,
+            "rel_L_2_test": 0.014981310612561735,
+            "runtime": 262.4448869228363
+          }
+        ],
+        "path": "exps/exp_linear/bilap_gaussian_results/bilap_gaussian_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 937,
+            "level_index": 1,
+            "rel_L_2_test": 0.014813460991012863,
+            "runtime": 262.5537939071655
+          }
+        ],
+        "path": "exps/exp_linear/bilap_gaussian_results/bilap_gaussian_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 929,
+            "level_index": 1,
+            "rel_L_2_test": 0.014964623615735865,
+            "runtime": 262.2681427001953
+          }
+        ],
+        "path": "exps/exp_linear/bilap_gaussian_results/bilap_gaussian_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 914,
+            "level_index": 1,
+            "rel_L_2_test": 0.014365946858203528,
+            "runtime": 262.4287328720093
+          }
+        ],
+        "path": "exps/exp_linear/bilap_gaussian_results/bilap_gaussian_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 910,
+            "level_index": 1,
+            "rel_L_2_test": 0.015178118914587287,
+            "runtime": 262.08337569236755
+          }
+        ],
+        "path": "exps/exp_linear/bilap_gaussian_results/bilap_gaussian_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 928,
+            "level_index": 1,
+            "rel_L_2_test": 0.014599770633340095,
+            "runtime": 262.3442711830139
+          }
+        ],
+        "path": "exps/exp_linear/bilap_gaussian_results/bilap_gaussian_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 931,
+            "level_index": 1,
+            "rel_L_2_test": 0.015468219040846016,
+            "runtime": 263.07026624679565
+          }
+        ],
+        "path": "exps/exp_linear/bilap_gaussian_results/bilap_gaussian_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 924,
+            "level_index": 1,
+            "rel_L_2_test": 0.016052593185253733,
+            "runtime": 263.6806561946869
+          }
+        ],
+        "path": "exps/exp_linear/bilap_gaussian_results/bilap_gaussian_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  },
+  "bilap_matern": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 1207.1,
+          "std": 20.4854962242938
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.02179929344813862,
+          "std": 0.002235493023923167
+        },
+        "runtime": {
+          "mean": 441.29955558776857,
+          "std": 18.875261479596112
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 1203,
+            "level_index": 1,
+            "rel_L_2_test": 0.024249351883802395,
+            "runtime": 447.34761786460876
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_results/bilap_matern_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1246,
+            "level_index": 1,
+            "rel_L_2_test": 0.020365661748023553,
+            "runtime": 457.61935782432556
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_results/bilap_matern_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1213,
+            "level_index": 1,
+            "rel_L_2_test": 0.019966712796431123,
+            "runtime": 453.5215413570404
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_results/bilap_matern_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1202,
+            "level_index": 1,
+            "rel_L_2_test": 0.027055266016809545,
+            "runtime": 393.42714643478394
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_results/bilap_matern_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1193,
+            "level_index": 1,
+            "rel_L_2_test": 0.020954587927482986,
+            "runtime": 431.7491557598114
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_results/bilap_matern_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1229,
+            "level_index": 1,
+            "rel_L_2_test": 0.021947933249132936,
+            "runtime": 446.9961540699005
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_results/bilap_matern_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1216,
+            "level_index": 1,
+            "rel_L_2_test": 0.02142175156940503,
+            "runtime": 446.5003159046173
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_results/bilap_matern_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1208,
+            "level_index": 1,
+            "rel_L_2_test": 0.02153937485149813,
+            "runtime": 458.5288317203522
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_results/bilap_matern_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1183,
+            "level_index": 1,
+            "rel_L_2_test": 0.019958977676381738,
+            "runtime": 438.00032663345337
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_results/bilap_matern_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 1178,
+            "level_index": 1,
+            "rel_L_2_test": 0.020533316762418756,
+            "runtime": 439.3051083087921
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_results/bilap_matern_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  },
+  "bilap_matern_low": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 525.2,
+          "std": 127.89648592166678
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.18463749095423887,
+          "std": 0.12820765891450678
+        },
+        "runtime": {
+          "mean": 241.87041606903077,
+          "std": 41.43311368355345
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 584,
+            "level_index": 1,
+            "rel_L_2_test": 0.11686602606588528,
+            "runtime": 273.8042001724243
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_low_results/bilap_matern_low_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 497,
+            "level_index": 1,
+            "rel_L_2_test": 0.16171959256073715,
+            "runtime": 193.38465929031372
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_low_results/bilap_matern_low_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 566,
+            "level_index": 1,
+            "rel_L_2_test": 0.11877602413066257,
+            "runtime": 273.3464467525482
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_low_results/bilap_matern_low_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 635,
+            "level_index": 1,
+            "rel_L_2_test": 0.09575107651843053,
+            "runtime": 273.24025535583496
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_low_results/bilap_matern_low_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 552,
+            "level_index": 1,
+            "rel_L_2_test": 0.10868271030561995,
+            "runtime": 274.1111626625061
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_low_results/bilap_matern_low_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 672,
+            "level_index": 1,
+            "rel_L_2_test": 0.10760750329054607,
+            "runtime": 275.51234340667725
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_low_results/bilap_matern_low_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 512,
+            "level_index": 1,
+            "rel_L_2_test": 0.19191462093480907,
+            "runtime": 194.88451886177063
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_low_results/bilap_matern_low_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 271,
+            "level_index": 1,
+            "rel_L_2_test": 0.41088433366384824,
+            "runtime": 192.70191526412964
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_low_results/bilap_matern_low_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 343,
+            "level_index": 1,
+            "rel_L_2_test": 0.4314627338469221,
+            "runtime": 193.9841012954712
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_low_results/bilap_matern_low_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 620,
+            "level_index": 1,
+            "rel_L_2_test": 0.10271028822492771,
+            "runtime": 273.7345576286316
+          }
+        ],
+        "path": "exps/exp_linear/bilap_matern_low_results/bilap_matern_low_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  },
+  "lap_gaussian": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 378.4,
+          "std": 9.85675177508065
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.010010195213149017,
+          "std": 0.00016643184556940628
+        },
+        "runtime": {
+          "mean": 129.04151120185853,
+          "std": 9.715498057852873
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 367,
+            "level_index": 1,
+            "rel_L_2_test": 0.009941086645406176,
+            "runtime": 122.90244626998901
+          }
+        ],
+        "path": "exps/exp_linear/lap_gaussian_results/lap_gaussian_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 367,
+            "level_index": 1,
+            "rel_L_2_test": 0.010021055043049534,
+            "runtime": 121.41421294212341
+          }
+        ],
+        "path": "exps/exp_linear/lap_gaussian_results/lap_gaussian_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 364,
+            "level_index": 1,
+            "rel_L_2_test": 0.010336153438108658,
+            "runtime": 130.90019345283508
+          }
+        ],
+        "path": "exps/exp_linear/lap_gaussian_results/lap_gaussian_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 387,
+            "level_index": 1,
+            "rel_L_2_test": 0.009832605502790377,
+            "runtime": 147.571222782135
+          }
+        ],
+        "path": "exps/exp_linear/lap_gaussian_results/lap_gaussian_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 378,
+            "level_index": 1,
+            "rel_L_2_test": 0.009954244862190435,
+            "runtime": 127.04635190963745
+          }
+        ],
+        "path": "exps/exp_linear/lap_gaussian_results/lap_gaussian_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 387,
+            "level_index": 1,
+            "rel_L_2_test": 0.009879237179772233,
+            "runtime": 144.87481021881104
+          }
+        ],
+        "path": "exps/exp_linear/lap_gaussian_results/lap_gaussian_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 394,
+            "level_index": 1,
+            "rel_L_2_test": 0.010039642996435564,
+            "runtime": 129.7598056793213
+          }
+        ],
+        "path": "exps/exp_linear/lap_gaussian_results/lap_gaussian_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 378,
+            "level_index": 1,
+            "rel_L_2_test": 0.010027963833054819,
+            "runtime": 122.72104167938232
+          }
+        ],
+        "path": "exps/exp_linear/lap_gaussian_results/lap_gaussian_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 380,
+            "level_index": 1,
+            "rel_L_2_test": 0.009830136023113377,
+            "runtime": 120.7967004776001
+          }
+        ],
+        "path": "exps/exp_linear/lap_gaussian_results/lap_gaussian_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 382,
+            "level_index": 1,
+            "rel_L_2_test": 0.010239826607568999,
+            "runtime": 122.42832660675049
+          }
+        ],
+        "path": "exps/exp_linear/lap_gaussian_results/lap_gaussian_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  },
+  "lap_matern": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 520.3,
+          "std": 39.774503279250524
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.011163870085690936,
+          "std": 0.00013418339908857684
+        },
+        "runtime": {
+          "mean": 218.31639158725739,
+          "std": 11.747059071604346
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 537,
+            "level_index": 1,
+            "rel_L_2_test": 0.011134982290352861,
+            "runtime": 210.73231101036072
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_results/lap_matern_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 584,
+            "level_index": 1,
+            "rel_L_2_test": 0.011318558861196716,
+            "runtime": 225.59115076065063
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_results/lap_matern_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 560,
+            "level_index": 1,
+            "rel_L_2_test": 0.011229712804973422,
+            "runtime": 221.33829712867737
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_results/lap_matern_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 537,
+            "level_index": 1,
+            "rel_L_2_test": 0.011069067412321604,
+            "runtime": 226.80763125419617
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_results/lap_matern_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 551,
+            "level_index": 1,
+            "rel_L_2_test": 0.010999573018855048,
+            "runtime": 218.64663910865784
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_results/lap_matern_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 470,
+            "level_index": 1,
+            "rel_L_2_test": 0.011425537630663467,
+            "runtime": 194.01874995231628
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_results/lap_matern_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 472,
+            "level_index": 1,
+            "rel_L_2_test": 0.011153494361946896,
+            "runtime": 233.14729762077332
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_results/lap_matern_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 518,
+            "level_index": 1,
+            "rel_L_2_test": 0.01103341804478694,
+            "runtime": 207.53625583648682
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_results/lap_matern_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 484,
+            "level_index": 1,
+            "rel_L_2_test": 0.011066655183980619,
+            "runtime": 229.21722102165222
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_results/lap_matern_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 490,
+            "level_index": 1,
+            "rel_L_2_test": 0.01120770124783178,
+            "runtime": 216.1283621788025
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_results/lap_matern_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  },
+  "lap_matern_low": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 560.4,
+          "std": 42.51065225982254
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.01165755477856355,
+          "std": 0.00035568094062854536
+        },
+        "runtime": {
+          "mean": 232.67040121555328,
+          "std": 5.108884953492368
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 553,
+            "level_index": 1,
+            "rel_L_2_test": 0.01117462909120113,
+            "runtime": 240.91755270957947
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_low_results/lap_matern_low_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 517,
+            "level_index": 1,
+            "rel_L_2_test": 0.012280178374064032,
+            "runtime": 236.1064293384552
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_low_results/lap_matern_low_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 599,
+            "level_index": 1,
+            "rel_L_2_test": 0.011768764551087439,
+            "runtime": 230.77546954154968
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_low_results/lap_matern_low_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 517,
+            "level_index": 1,
+            "rel_L_2_test": 0.01185499274052648,
+            "runtime": 237.4224829673767
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_low_results/lap_matern_low_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 572,
+            "level_index": 1,
+            "rel_L_2_test": 0.011925705677405243,
+            "runtime": 234.1955029964447
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_low_results/lap_matern_low_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 533,
+            "level_index": 1,
+            "rel_L_2_test": 0.011579657047081988,
+            "runtime": 223.37111949920654
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_low_results/lap_matern_low_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 564,
+            "level_index": 1,
+            "rel_L_2_test": 0.011835153908197173,
+            "runtime": 234.74817943572998
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_low_results/lap_matern_low_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 539,
+            "level_index": 1,
+            "rel_L_2_test": 0.011455669669448628,
+            "runtime": 231.40931606292725
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_low_results/lap_matern_low_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 552,
+            "level_index": 1,
+            "rel_L_2_test": 0.011098018169842527,
+            "runtime": 230.52999138832092
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_low_results/lap_matern_low_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 658,
+            "level_index": 1,
+            "rel_L_2_test": 0.011602778556780853,
+            "runtime": 227.22796821594238
+          }
+        ],
+        "path": "exps/exp_linear/lap_matern_low_results/lap_matern_low_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  },
+  "reg_gaussian": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 511.4,
+          "std": 15.21840990379744
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.012003098879823119,
+          "std": 0.0005583194414032173
+        },
+        "runtime": {
+          "mean": 200.8290025949478,
+          "std": 8.238615442103521
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 523,
+            "level_index": 1,
+            "rel_L_2_test": 0.012241765633308697,
+            "runtime": 212.84593152999878
+          }
+        ],
+        "path": "exps/exp_linear/reg_gaussian_results/reg_gaussian_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 485,
+            "level_index": 1,
+            "rel_L_2_test": 0.012221183824130257,
+            "runtime": 194.76018142700195
+          }
+        ],
+        "path": "exps/exp_linear/reg_gaussian_results/reg_gaussian_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 530,
+            "level_index": 1,
+            "rel_L_2_test": 0.012614890134978683,
+            "runtime": 210.4022512435913
+          }
+        ],
+        "path": "exps/exp_linear/reg_gaussian_results/reg_gaussian_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 534,
+            "level_index": 1,
+            "rel_L_2_test": 0.01159754471643291,
+            "runtime": 204.16829800605774
+          }
+        ],
+        "path": "exps/exp_linear/reg_gaussian_results/reg_gaussian_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 509,
+            "level_index": 1,
+            "rel_L_2_test": 0.011281067601648504,
+            "runtime": 202.6789608001709
+          }
+        ],
+        "path": "exps/exp_linear/reg_gaussian_results/reg_gaussian_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 507,
+            "level_index": 1,
+            "rel_L_2_test": 0.012445041538991054,
+            "runtime": 188.9509027004242
+          }
+        ],
+        "path": "exps/exp_linear/reg_gaussian_results/reg_gaussian_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 511,
+            "level_index": 1,
+            "rel_L_2_test": 0.011684913397742728,
+            "runtime": 202.71720242500305
+          }
+        ],
+        "path": "exps/exp_linear/reg_gaussian_results/reg_gaussian_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 515,
+            "level_index": 1,
+            "rel_L_2_test": 0.012331353766074653,
+            "runtime": 200.95345044136047
+          }
+        ],
+        "path": "exps/exp_linear/reg_gaussian_results/reg_gaussian_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 493,
+            "level_index": 1,
+            "rel_L_2_test": 0.011045249688572354,
+            "runtime": 203.15035009384155
+          }
+        ],
+        "path": "exps/exp_linear/reg_gaussian_results/reg_gaussian_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 507,
+            "level_index": 1,
+            "rel_L_2_test": 0.012567978496351351,
+            "runtime": 187.6624972820282
+          }
+        ],
+        "path": "exps/exp_linear/reg_gaussian_results/reg_gaussian_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  },
+  "reg_matern": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 554.6,
+          "std": 9.720539536923292
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.013461762209717829,
+          "std": 0.0009059823608031885
+        },
+        "runtime": {
+          "mean": 223.04536130428315,
+          "std": 5.521447661343575
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 561,
+            "level_index": 1,
+            "rel_L_2_test": 0.014696130104970666,
+            "runtime": 216.99940276145935
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_results/reg_matern_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 569,
+            "level_index": 1,
+            "rel_L_2_test": 0.013892059600914082,
+            "runtime": 222.39615988731384
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_results/reg_matern_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 562,
+            "level_index": 1,
+            "rel_L_2_test": 0.013298438122634312,
+            "runtime": 230.13699460029602
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_results/reg_matern_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 549,
+            "level_index": 1,
+            "rel_L_2_test": 0.013818506313168027,
+            "runtime": 215.01664781570435
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_results/reg_matern_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 549,
+            "level_index": 1,
+            "rel_L_2_test": 0.015057724095547172,
+            "runtime": 216.37246966362
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_results/reg_matern_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 548,
+            "level_index": 1,
+            "rel_L_2_test": 0.012619847169659299,
+            "runtime": 222.2677891254425
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_results/reg_matern_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 568,
+            "level_index": 1,
+            "rel_L_2_test": 0.012803736327168531,
+            "runtime": 227.0018970966339
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_results/reg_matern_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 553,
+            "level_index": 1,
+            "rel_L_2_test": 0.012304481859734998,
+            "runtime": 227.08204174041748
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_results/reg_matern_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 546,
+            "level_index": 1,
+            "rel_L_2_test": 0.013362346214721507,
+            "runtime": 223.39327907562256
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_results/reg_matern_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 541,
+            "level_index": 1,
+            "rel_L_2_test": 0.012764352288659695,
+            "runtime": 229.7869312763214
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_results/reg_matern_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  },
+  "reg_matern_low": {
+    "levels": [
+      {
+        "final_supp": {
+          "mean": 541.4,
+          "std": 14.41604044882721
+        },
+        "level_index": 1,
+        "num_runs_with_level": 10,
+        "rel_L_2_test": {
+          "mean": 0.013005119810201447,
+          "std": 0.0007301431406550022
+        },
+        "runtime": {
+          "mean": 213.44176766872405,
+          "std": 3.911859576441533
+        }
+      }
+    ],
+    "num_runs": 10,
+    "runs": [
+      {
+        "levels": [
+          {
+            "final_supp": 559,
+            "level_index": 1,
+            "rel_L_2_test": 0.01344678545966876,
+            "runtime": 214.26421117782593
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_low_results/reg_matern_low_seed_200.pkl",
+        "seed": 200
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 524,
+            "level_index": 1,
+            "rel_L_2_test": 0.012318644321817883,
+            "runtime": 205.6553111076355
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_low_results/reg_matern_low_seed_201.pkl",
+        "seed": 201
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 556,
+            "level_index": 1,
+            "rel_L_2_test": 0.013479254501613441,
+            "runtime": 215.0620083808899
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_low_results/reg_matern_low_seed_202.pkl",
+        "seed": 202
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 547,
+            "level_index": 1,
+            "rel_L_2_test": 0.014048479612467852,
+            "runtime": 217.49928164482117
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_low_results/reg_matern_low_seed_203.pkl",
+        "seed": 203
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 531,
+            "level_index": 1,
+            "rel_L_2_test": 0.013307860916673664,
+            "runtime": 214.19072675704956
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_low_results/reg_matern_low_seed_204.pkl",
+        "seed": 204
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 559,
+            "level_index": 1,
+            "rel_L_2_test": 0.012529510361077353,
+            "runtime": 214.9204819202423
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_low_results/reg_matern_low_seed_205.pkl",
+        "seed": 205
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 526,
+            "level_index": 1,
+            "rel_L_2_test": 0.011880510121436474,
+            "runtime": 214.07642889022827
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_low_results/reg_matern_low_seed_206.pkl",
+        "seed": 206
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 545,
+            "level_index": 1,
+            "rel_L_2_test": 0.01230343529013519,
+            "runtime": 211.6346824169159
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_low_results/reg_matern_low_seed_207.pkl",
+        "seed": 207
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 544,
+            "level_index": 1,
+            "rel_L_2_test": 0.013857955948776755,
+            "runtime": 218.60144305229187
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_low_results/reg_matern_low_seed_208.pkl",
+        "seed": 208
+      },
+      {
+        "levels": [
+          {
+            "final_supp": 523,
+            "level_index": 1,
+            "rel_L_2_test": 0.012878761568347073,
+            "runtime": 208.5131013393402
+          }
+        ],
+        "path": "exps/exp_linear/reg_matern_low_results/reg_matern_low_seed_209.pkl",
+        "seed": 209
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+pde:
+  name: "bilap_high_dim"
+  cls: "BiLapHighDim"
+  rhs_type: "sum"
+  Nobs_int: 1296
+  Nobs_bnd: 2800
+  d: 4
+  sampling: "grid"
+  power: 8.01
+  scale: 1000
+  init_pad_size: 256
+  add_noise: false
+  Ntest: 20
+
+kernel:
+  type: "gaussian"
+  anisotropic: false
+  sigma_min: 0.001
+  sigma_max: 1.0
+
+solver:
+  # global defaults shared across phases (unless overridden)
+  fp64: true
+  alpha: 1.0e-4
+  T: 1000.0
+  gamma: 0.0
+  Ntrial: 10000
+  blocksize: -1
+  print_every: 100
+  plot_every: 100
+
+  phases:
+    - name: "outer"
+      solver_name: "outer_aux"          # maps to src.solver.solve
+      max_step: 3000
+      TOL: 1.0e-10
+      plot_final: true
+
+  homotopy:
+    enabled: true
+    num_levels: 2
+    alpha_factor: 0.01              # alpha <- alpha * 0.1 after each level
+    T_factor: 10                 # T <- T * 10 after each level
