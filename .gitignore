@@ -16,3 +16,5 @@ figs/
 .vscode/
 *.pkl
 *_*results/
+pinn
+pinn-jax
