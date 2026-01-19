@@ -18,3 +18,4 @@ figs/
 *_*results/
 pinn
 pinn-jax
+ref_solvers
