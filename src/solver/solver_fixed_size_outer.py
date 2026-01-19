@@ -113,24 +113,15 @@ def solve(p, y_ref, alg_opts):
     pad_size = xk.shape[0]
     
     for k in range(1, max_step  + 1):
-        Grad_E = p.kernel.Grad_E_kappa_X_c_Xhat(xk, sk, ck, p.xhat_int)
-        Grad_B = p.kernel.Grad_B_kappa_X_c_Xhat(xk, sk, ck, p.xhat_bnd)
-        
-        Dc_E_kappa, Dx_E_kappa, Ds_E_kappa = Grad_E['grad_c'], Grad_E['grad_X'], Grad_E['grad_S']
-        Dc_B_kappa, Dx_B_kappa, Ds_B_kappa = Grad_B['grad_c'], Grad_B['grad_X'], Grad_B['grad_S']
-        
+        Dc_E_kappa = p.kernel.Grad_c_E_kappa_X_c_Xhat(xk, sk, ck, p.xhat_int)
+        Dc_B_kappa = p.kernel.Grad_c_B_kappa_X_c_Xhat(xk, sk, ck, p.xhat_bnd)
+
         Gp_c = jnp.vstack([Dc_E_kappa, Dc_B_kappa])
-        Gp_x = jnp.vstack([Dx_E_kappa, Dx_B_kappa])
-        Gp_s = jnp.vstack([Ds_E_kappa, Ds_B_kappa])
-        
-        if Gp_s.ndim == 2:
-            Gp_s = Gp_s[:, :, None]
-        Gp_xs = jnp.dstack([Gp_x, Gp_s])
-        
-        # We optimize over qk, xk, and sk
-        Gp = jnp.hstack([Gp_c, shape_dK(Gp_xs)])
-        Gp = Gp * suppGp[None, :] # only keep the active points #### TODO: ADD ACTIVE POINTS SETTING ####
-        compact_ind = jnp.argsort(~suppGp) # index used to shift all the active points to the front
+        Gp = Gp_c
+
+        Gp = Gp * suppc[None, :] # only keep the active points #### TODO: ADD ACTIVE POINTS SETTING ####
+
+        compact_ind = jnp.argsort(~suppc) # index used to shift all the active points to the front
 
         if blocksize > 0: # if -1 that means no blocksize limit
             compact_ind = compact_ind[:blocksize]
@@ -155,15 +146,8 @@ def solve(p, y_ref, alg_opts):
         II = obj.ddF_quad(misfit, Gp_compact) # Approximate Hessian
 
 
-        kpp = 0.1 * jnp.linalg.norm(obj.dF(misfit), 1) * jnp.reshape(
-            jnp.sqrt(jnp.finfo(float).eps) + jnp.tile(jnp.abs(ck), (dim, 1)), -1
-        )
-        
 
-        Icor_diag = jnp.concatenate([
-            jnp.sqrt(jnp.finfo(float).eps) * suppc,
-            kpp
-        ])
+        Icor_diag = jnp.sqrt(jnp.finfo(float).eps) * suppc
         Icor_diag_compact = Icor_diag[compact_ind]
         # Icor = jnp.diag(Icor_diag_compact)
 
@@ -171,11 +155,14 @@ def solve(p, y_ref, alg_opts):
         II = II.at[jnp.diag_indices(II.shape[0])].add(Icor_diag_compact)
         HH = (1 / alpha) * II
 
-        DP_diag = jnp.concatenate([
-            (jnp.abs(qk) >= 1),
-            jnp.tile((jnp.abs(ck) > 0), (dim,))
-        ])
+        # DP_diag = jnp.concatenate([
+        #     (jnp.abs(qk) >= 1),
+        #     jnp.tile((jnp.abs(ck) > 0), (dim,))
+        # ])
+        DP_diag = (jnp.abs(qk) >= 1)
         DP_diag_compact = DP_diag[compact_ind]
+        
+
 
         # DP = jnp.diag(DP_diag_compact)
         DDphi_diag = jnp.concatenate([DDphima(ck), jnp.zeros((dim * pad_size))]) * suppGp
@@ -237,13 +224,14 @@ def solve(p, y_ref, alg_opts):
         has_descent = False
 
         # dz = dz[inv_compact_ind] # reorder dz to the original order
-        dz = jnp.zeros(suppGp.shape[0]).at[compact_ind].set(dz) # reorder dz to the original order
-        dz = dz * suppGp # only keep the active points redundant, but safe
+        dz = jnp.zeros(suppc.shape[0]).at[compact_ind].set(dz) # reorder dz to the original order
+        dz = dz * suppc # only keep the active points redundant, but safe
         while not has_descent and theta > 1e-20:
-            qk = qold + theta * dz[:pad_size]
-            dxs = dz[pad_size:].reshape(dim, -1).T
-            xk = xold + theta * dxs[:, :d]
-            sk = sold + theta * dxs[:, d:]
+            # qk = qold + theta * dz[:pad_size]
+            qk = qold + theta * dz
+            # dxs = dz[pad_size:].reshape(dim, -1).T
+            # xk = xold + theta * dxs[:, :d]
+            # sk = sold + theta * dxs[:, d:]
             ck = Prox(qk)
 
             yk, linear_results_int, linear_results_bnd = compute_rhs(p, xk, sk, ck)
